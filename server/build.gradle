@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group 'org.example'
+group 'org.org.example'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -10,6 +10,10 @@ repositories {
 }
 
 dependencies {
+    // Spring-Boot Framework
+
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.2.1'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
