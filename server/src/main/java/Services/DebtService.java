@@ -2,7 +2,6 @@ package Services;
 
 import model.Debt;
 import repository.DebtRepository;
-import repository.Repository;
 
 public class DebtService {
     DebtRepository debtRepository;

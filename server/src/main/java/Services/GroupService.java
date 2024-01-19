@@ -1,9 +1,7 @@
 package Services;
 
-import model.Debt;
 import model.Group;
 import repository.GroupRepository;
-import repository.Repository;
 
 public class GroupService {
     GroupRepository groupRepository;

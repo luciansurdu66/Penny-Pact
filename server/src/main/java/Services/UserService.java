@@ -1,8 +1,6 @@
 package Services;
 
-import model.Debt;
 import model.User;
-import repository.Repository;
 import repository.UserRepository;
 
 public class UserService {
