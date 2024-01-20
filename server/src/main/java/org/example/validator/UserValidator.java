@@ -9,19 +9,37 @@ public class UserValidator implements Validator<User> {
 
     @Override
     public void validate(User user) throws ValidatorException {
-        // TODO: Check if the user is valid. (e.g., the username,
-        //  email, and password are not empty Strings.)
-        //
-        //  Code Example:
-        //
-        //      String username = user.getUsername(),
-        //              email = user.getPassword(),
-        //              password = user.getPassword();
-        //
-        //      if (username.isEmpty()) {
-        //          throw new ValidatorException("Empty username");
-        //      }
-        //
-        //      ...
+        validateUserId(user.getId());
+        validateStringFieldNotBlank(
+            user.getUsername(),
+            user.getEmail(),
+            user.getPassword()
+        );
+    }
+
+    /**
+     * Validates the id of a user.
+     * @param id The id of the user.
+     * @throws ValidatorException The id is invalid.
+     */
+    private void validateUserId(int id) throws ValidatorException {
+        if (id <= 0) {
+            throw new ValidatorException("Invalid user id");
+        }
+    }
+
+    /**
+     * Validates that a user string field (e.g., username) is not blank.
+     * @param fields The validated field.
+     * @throws ValidatorException The field is blank.
+     */
+    private void validateStringFieldNotBlank(
+        String... fields
+    ) throws ValidatorException {
+        for (String field : fields) {
+            if (field.isBlank()) {
+                throw new ValidatorException("Blank user field");
+            }
+        }
     }
 }
