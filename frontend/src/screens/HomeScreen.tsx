@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
       <Text style={styles.title}>Penny Pact</Text>
       <View style={styles.buttonContainer}>
         <GradientButton title="Go to Login" onPress={() => navigation.navigate('Login' as never)} />
-        <GradientButton title="Go to Sign Up" onPress={() => navigation.navigate('SignUp' as never)} />
+        <GradientButton title="Go to Sign Up" onPress={() => navigation.navigate('Signup' as never)} />
       </View>
     </View>
   );
