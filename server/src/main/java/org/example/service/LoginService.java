@@ -1,5 +1,6 @@
 package org.example.service;
 
+import com.nimbusds.jose.proc.BadJWSException;
 import org.example.dto.UserDto;
 import org.example.mapper.Mapper;
 import org.example.model.User;
@@ -11,11 +12,14 @@ import org.springframework.stereotype.Service;
 public class LoginService {
 
     private final UserRepository userRepository;
+    private final TokenService tokenService;
 
     public LoginService(
-        @Qualifier("mockUserRepository") UserRepository userRepository
+        @Qualifier("mockUserRepository") UserRepository userRepository,
+        TokenService tokenService
     ) {
         this.userRepository = userRepository;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -24,9 +28,9 @@ public class LoginService {
      *
      * @param email The email of the user.
      * @param password The password of the user.
-     * @return The user if successful, otherwise null.
+     * @return A JWT token associated with that user if successful, null otherwise.
      */
-    public UserDto authenticate(String email, String password) {
+    public String authenticate(String email, String password) {
         User user = userRepository.findByEmail(email);
 
         if (user == null ||
@@ -34,6 +38,6 @@ public class LoginService {
             return null;
         }
 
-        return Mapper.toUserDto(user);
+        return tokenService.generateJwt(user);
     }
 }

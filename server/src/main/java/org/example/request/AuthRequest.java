@@ -1,6 +1,6 @@
 package org.example.request;
 
-public class AuthRequestBody {
+public class AuthRequest {
 
     private String email;
     private String password;

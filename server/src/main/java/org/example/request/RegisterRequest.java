@@ -1,6 +1,6 @@
 package org.example.request;
 
-public class RegisterRequestBody {
+public class RegisterRequest {
 
     private String username,
             email,

@@ -1,5 +1,7 @@
 package org.example.model;
 
+import java.util.Objects;
+
 public class User {
 
     private int id;
@@ -39,6 +41,17 @@ public class User {
         this.lastName = lastName;
         this.email = email;
     }
+
+    // Overrides
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id || Objects.equals(email, user.email);
+    }
+
 
     // Getters and Setters
 

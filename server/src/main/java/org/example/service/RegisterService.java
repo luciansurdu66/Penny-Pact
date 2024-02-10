@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.dto.UserDto;
+import org.example.exception.ValidatorException;
 import org.example.mapper.Mapper;
 import org.example.model.User;
 import org.example.repository.UserRepository;
@@ -13,13 +14,16 @@ public class RegisterService {
 
     private final UserRepository userRepository;
     private final UserValidator userValidator;
+    private final TokenService tokenService;
 
     public RegisterService(
         @Qualifier("mockUserRepository") UserRepository userRepository,
-        UserValidator userValidator
+        UserValidator userValidator,
+        TokenService tokenService
     ) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -28,20 +32,21 @@ public class RegisterService {
      * @param username The username of the user.
      * @param email The email of the user.
      * @param password The password of the user.
-     * @return The registered user.
+     * @return The token associated with the new user.
      */
-    public UserDto register(
+    public String register(
         String username,
         String email,
         String password
     ) {
         int id = generateUniqueUserId();
+
         User user = new User(id, username, email, password);
 
         userValidator.validate(user);
         user = userRepository.save(user);
 
-        return Mapper.toUserDto(user);
+        return tokenService.generateJwt(user);
     }
 
     /**

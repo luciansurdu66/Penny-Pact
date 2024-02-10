@@ -37,7 +37,7 @@ public class UserValidator implements Validator<User> {
         String... fields
     ) throws ValidatorException {
         for (String field : fields) {
-            if (field.isBlank()) {
+            if (field == null || field.isBlank()) {
                 throw new ValidatorException("Blank user field");
             }
         }

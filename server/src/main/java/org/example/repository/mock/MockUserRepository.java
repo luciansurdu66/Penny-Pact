@@ -43,7 +43,7 @@ public class MockUserRepository implements UserRepository {
 
     @Override
     public User save(User user) throws DuplicatedEntityException {
-        if (users.containsKey(user.getId())) {
+        if (users.containsValue(user)) {
             throw new DuplicatedEntityException();
         }
 
