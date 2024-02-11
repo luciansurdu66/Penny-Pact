@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import GradientButton from '../components/GradientButton';
+import { useAuth } from '../providers/AuthProvider';
+import AuthService from '../services/AuthService';
 
-const SignupScreen: React.FC = () => {
+const SignUpScreen: React.FC = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,8 +15,11 @@ const SignupScreen: React.FC = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [serverErrorMessage, setServerErrorMessage] = useState('');
 
-  const handleSignup = () => {
+  const { token, setToken } = useAuth();
+
+  const handleSignUp = () => {
     // Reset errors
     setUsernameError('');
     setEmailError('');
@@ -38,15 +43,35 @@ const SignupScreen: React.FC = () => {
       setConfirmPasswordError('Passwords do not match');
     }
 
-    // If no errors, handle signup logic here
-    if (username !== '' && email !== '' && password !== '' && confirmPassword !== '' && password === confirmPassword) {
-      // Signup logic
+    // If no errors, handle signup logic here.
+    if (username !== '' && 
+      email !== '' && 
+      password !== '' && 
+      confirmPassword !== '' && 
+      password === confirmPassword
+    ) {   // Signup logic.
+      AuthService.signUp(username, email, password)
+        .then(response => { 
+          setServerErrorMessage('');
+          setToken(response.data.jwtToken);
+        })
+        .catch(error => {
+          setToken('');
+
+          if (!error.response) {
+            setServerErrorMessage('Could not reach the server...');
+          } else {
+            setServerErrorMessage(error.response.data.message);
+          }
+        });
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+      <Text style={styles.title}>
+        Sign Up
+      </Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -58,7 +83,11 @@ const SignupScreen: React.FC = () => {
         />
         <Icon name="user" size={15} color="#fff" style={styles.icon} />
       </View>
-      {usernameError ? <Text style={styles.errorText}>{usernameError}</Text> : null}
+      {usernameError && 
+        <Text style={styles.errorText}>
+          {usernameError}
+        </Text>
+      }
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -71,7 +100,11 @@ const SignupScreen: React.FC = () => {
         />
         <Icon name="envelope" size={15} color="#fff" style={styles.icon} />
       </View>
-      {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+      {emailError && 
+        <Text style={styles.errorText}>
+          {emailError}
+        </Text>
+      }
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -85,7 +118,11 @@ const SignupScreen: React.FC = () => {
           <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={15} color="#fff" />
         </TouchableOpacity>
       </View>
-      {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+      {passwordError && 
+        <Text style={styles.errorText}>
+          {passwordError}
+        </Text>
+      }
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -99,8 +136,20 @@ const SignupScreen: React.FC = () => {
           <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={15} color="#fff" />
         </TouchableOpacity>
       </View>
-      {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
-      <GradientButton title="Sign Up" onPress={handleSignup} />
+      {confirmPasswordError && 
+        <Text style={styles.errorText}>
+          {confirmPasswordError}
+        </Text>
+      }
+      {serverErrorMessage &&
+        <Text style={styles.errorText}>
+          {serverErrorMessage}
+        </Text>
+      }
+      {token && 
+        <Text>{token}</Text>
+      }
+      <GradientButton title="Sign Up" onPress={handleSignUp} />
     </View>
   );
 };
@@ -151,4 +200,4 @@ const styles = StyleSheet.create({
       },
   });
 
-export default SignupScreen;
+export default SignUpScreen;
