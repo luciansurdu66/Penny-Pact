@@ -1,8 +1,5 @@
 package org.example.service;
 
-import com.nimbusds.jose.proc.BadJWSException;
-import org.example.dto.UserDto;
-import org.example.mapper.Mapper;
 import org.example.model.User;
 import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Qualifier;

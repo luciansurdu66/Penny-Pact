@@ -39,7 +39,7 @@ public class MockUserRepository implements UserRepository {
         ));
     }
 
-    // Overrides.
+    // Overrides
 
     @Override
     public User save(User user) throws DuplicatedEntityException {

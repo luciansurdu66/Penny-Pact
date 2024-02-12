@@ -4,10 +4,14 @@ import org.example.exception.DuplicatedEntityException;
 import org.example.exception.EntityNotFoundException;
 import org.example.model.Debt;
 import org.example.repository.DebtRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Repository
+@Qualifier("mockDebtRepository")
 public class MockDebtRepository implements DebtRepository {
 
     Map<Integer, Debt> debts;
@@ -19,7 +23,7 @@ public class MockDebtRepository implements DebtRepository {
         ));
     }
 
-    // Overrides.
+    // Overrides
 
     @Override
     public Debt save(Debt debt) throws DuplicatedEntityException {
@@ -35,6 +39,14 @@ public class MockDebtRepository implements DebtRepository {
     @Override
     public Debt findById(Integer id) {
         return debts.get(id);
+    }
+
+    @Override
+    public Iterable<Debt> findByGroupId(int groupId) {
+        return debts.values()
+            .stream()
+            .filter(debt -> debt.getGroupId() == groupId)
+            .toList();
     }
 
     @Override

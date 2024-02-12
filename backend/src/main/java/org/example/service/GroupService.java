@@ -2,28 +2,23 @@ package org.example.service;
 
 import org.example.model.Group;
 import org.example.repository.GroupRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Service
 public class GroupService {
 
     GroupRepository groupRepository;
 
-    public GroupService(GroupRepository _groupRepository) {
+    public GroupService(
+        @Qualifier("mockGroupRepository") GroupRepository _groupRepository
+    ) {
         groupRepository = _groupRepository;
     }
 
-    public void save(Group group) {
-        groupRepository.save(group);
-    }
-
-    public void remove(Integer id) {
-        groupRepository.remove(id);
-    }
-
-    public void update(Group group) {
-        groupRepository.update(group);
-    }
-
-    public Iterable<Group> getAll() {
-        return groupRepository.findAll();
+    public List<Group> getGroupsByIds(List<Integer> groupIds) {
+        return groupRepository.findGroupsByIds(groupIds);
     }
 }

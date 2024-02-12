@@ -41,8 +41,7 @@ public class SecurityConfiguration {
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey
-            .Builder(keys.getPublicKey())
+        JWK jwk = new RSAKey.Builder(keys.getPublicKey())
             .privateKey(keys.getPrivateKey())
             .build();
 
@@ -52,8 +51,7 @@ public class SecurityConfiguration {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder
-            .withPublicKey(keys.getPublicKey())
+        return NimbusJwtDecoder.withPublicKey(keys.getPublicKey())
             .build();
     }
 }

@@ -2,34 +2,41 @@ package org.example.repository.mock;
 
 import org.example.exception.DuplicatedEntityException;
 import org.example.exception.EntityNotFoundException;
-import org.example.model.Expense;
-import org.example.repository.ExpenseRepository;
+import org.example.model.Payment;
+import org.example.repository.PaymentRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MockExpenseRepository implements ExpenseRepository {
+@Repository
+@Qualifier("mockPaymentRepository")
+public class MockPaymentRepository implements PaymentRepository {
 
-    Map<Integer, Expense> expenses;
+    Map<Integer, Payment> expenses;
 
-    public MockExpenseRepository() {
+    public MockPaymentRepository() {
         expenses = new HashMap<>(Map.of(
-               1, new Expense(
+               1, new Payment(
                        1,
+                        1,
                         "Lidl",
                         1,
                         376.50,
                         LocalDate.of(2023, 12, 10)),
-                2, new Expense(
+                2, new Payment(
                         2,
+                        1,
                         "Factura E.ON",
                         2,
                         488.10,
                         LocalDate.of(2023, 12, 2)
                 ),
-                3, new Expense(
+                3, new Payment(
                         3,
+                        1,
                         "Electrica",
                         3,
                         8.50,
@@ -38,10 +45,10 @@ public class MockExpenseRepository implements ExpenseRepository {
         ));
     }
 
-    // Overrides.
+    // Overrides
 
     @Override
-    public Expense save(Expense expense) throws DuplicatedEntityException {
+    public Payment save(Payment expense) throws DuplicatedEntityException {
         if (expenses.containsKey(expense.getId())) {
             throw new DuplicatedEntityException();
         }
@@ -52,18 +59,18 @@ public class MockExpenseRepository implements ExpenseRepository {
     }
 
     @Override
-    public Expense findById(Integer id) {
+    public Payment findById(Integer id) {
         return expenses.get(id);
     }
 
     @Override
-    public Iterable<Expense> findAll() {
+    public Iterable<Payment> findAll() {
         return expenses.values();
     }
 
     @Override
-    public void update(Expense modifiedExpense) throws EntityNotFoundException {
-        Expense oldExpense = expenses.get(modifiedExpense.getId());
+    public void update(Payment modifiedExpense) throws EntityNotFoundException {
+        Payment oldExpense = expenses.get(modifiedExpense.getId());
 
         if (oldExpense == null) {
             throw new EntityNotFoundException();
@@ -73,7 +80,7 @@ public class MockExpenseRepository implements ExpenseRepository {
     }
 
     @Override
-    public Expense remove(Integer id) throws EntityNotFoundException {
+    public Payment remove(Integer id) throws EntityNotFoundException {
         if (!expenses.containsKey(id)) {
             throw new EntityNotFoundException();
         }
@@ -82,7 +89,7 @@ public class MockExpenseRepository implements ExpenseRepository {
     }
 
     @Override
-    public Iterable<Expense> getAllByGroup(int groupId) {
+    public Iterable<Payment> getAllByGroup(int groupId) {
         return expenses.values()
                 .stream()
                 .filter((e) -> e.getGroupId() == groupId)

@@ -4,10 +4,15 @@ import org.example.exception.DuplicatedEntityException;
 import org.example.exception.EntityNotFoundException;
 import org.example.model.Group;
 import org.example.repository.GroupRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+@Repository
+@Qualifier("mockGroupRepository")
 public class MockGroupRepository implements GroupRepository {
 
     Map<Integer, Group> groups;
@@ -20,7 +25,7 @@ public class MockGroupRepository implements GroupRepository {
         ));
     }
 
-    // Overrides.
+    // Overrides
 
     @Override
     public Group save(Group group) throws DuplicatedEntityException {
@@ -36,6 +41,13 @@ public class MockGroupRepository implements GroupRepository {
     @Override
     public Group findById(Integer id) {
         return groups.get(id);
+    }
+
+    @Override
+    public List<Group> findGroupsByIds(List<Integer> groupIds) {
+        return groupIds.stream()
+            .map(groupId -> groups.get(groupId))
+            .toList();
     }
 
     @Override

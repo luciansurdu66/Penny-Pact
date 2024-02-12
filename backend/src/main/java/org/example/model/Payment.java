@@ -2,7 +2,7 @@ package org.example.model;
 
 import java.time.LocalDate;
 
-public class Expense {
+public class Payment {
 
     private int id,
             groupId,
@@ -11,8 +11,9 @@ public class Expense {
     private LocalDate date;
     private String name;
 
-    public Expense(int id, String name, int userId, double amount, LocalDate date) {
+    public Payment(int id, int groupId, String name, int userId, double amount, LocalDate date) {
         this.id = id;
+        this.groupId = groupId;
         this.name = name;
         this.userId = userId;
         this.amount = amount;

@@ -28,12 +28,10 @@ public class LoginController {
         String jwtToken = loginService.authenticate(email, password);
 
         if (jwtToken == null) {
-            return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .build();
         }
 
-        return ResponseEntity
-            .ok(new AuthResponse(jwtToken));
+        return ResponseEntity.ok(new AuthResponse(jwtToken));
     }
 }

@@ -36,16 +36,12 @@ public class RegisterController {
 
         try {
             String jwtToken = registerService.register(username, email, password);
-
-            response = ResponseEntity
-                .ok(new AuthResponse(jwtToken));
+            response = ResponseEntity.ok(new AuthResponse(jwtToken));
         } catch (ValidatorException e) {
-            response = ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+            response = ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getMessage()));
         } catch (DuplicatedEntityException e) {
-            response = ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+            response = ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("Email already exists"));
         }
 

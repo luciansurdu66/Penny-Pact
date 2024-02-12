@@ -33,6 +33,10 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
     public User getById(Integer id) {
         return userRepository.findById(id);
     }
