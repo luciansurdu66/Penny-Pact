@@ -1,16 +1,34 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Make sure to install this package
+import Icon from 'react-native-vector-icons/FontAwesome';
 import GradientButton from '../components/GradientButton';
+import AuthService from '../services/AuthService';
+import { useAuth } from '../providers/AuthProvider';
 
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = () => {
-    // Handle login logic here
-  };
+  const { token, setToken } = useAuth();
+
+  const handleLogin = useCallback(() => {
+    AuthService.login(email, password)
+      .then(response => { 
+        setErrorMessage('');
+        setToken(response.data.jwtToken);
+      })
+      .catch(error => {
+        setToken('');
+
+        if (!error.response) {
+          setErrorMessage('Could not reach the server...');
+        } else {
+          setErrorMessage('Invalid credentials');
+        }
+      });
+  }, [email, password]);
 
   return (
     <View style={styles.container}>
@@ -40,6 +58,14 @@ const LoginScreen: React.FC = () => {
           <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={15} color="#fff" />
         </TouchableOpacity>
       </View>
+      {token && 
+        <Text>{token}</Text>
+      }
+      {errorMessage && 
+        <Text style={{ color: "red" }}>
+          {errorMessage}
+        </Text>
+      }
       <GradientButton title="Login" onPress={handleLogin} />
     </View>
   );
