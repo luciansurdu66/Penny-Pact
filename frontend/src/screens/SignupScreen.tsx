@@ -25,6 +25,7 @@ const SignUpScreen: React.FC = () => {
     setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
+    setServerErrorMessage('');
 
     // Validate fields and set errors if necessary
     if (username === '') {
