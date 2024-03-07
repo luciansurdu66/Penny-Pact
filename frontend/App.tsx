@@ -21,7 +21,18 @@ const App: React.FC = () => {
     <GestureHandlerRootView>
       <GroupScreen groups={groups} />
     </GestureHandlerRootView>
+  
     // <PaymentCard name={'Lidl'} date={new Date()} user={'Dan Nechita'} amount={376.50} />
+    
+    // <AuthProvider>
+    //   <NavigationContainer>
+    //     <Stack.Navigator initialRouteName="Home">
+    //       <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} />
+    //       <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}} />
+    //       <Stack.Screen name="SignUp" component={SignUpScreen} options={{headerShown: false}} />
+    //     </Stack.Navigator>
+    //   </NavigationContainer>
+    // </AuthProvider>
   );
 };
 
