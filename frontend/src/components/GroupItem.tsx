@@ -6,7 +6,7 @@ interface GroupItemProps {
 }
 
 const GroupItem: FC<GroupItemProps> = ({ name }) => {
-  const defaultGroupImage = '../../assets/images/landscape.jpg'
+  const defaultGroupImage = '../../assets/images/landscape.jpg';
 
   return (
     <TouchableNativeFeedback>
@@ -31,7 +31,8 @@ const styles = StyleSheet.create({
     borderRadius: 32,
   },
   name: {
-    fontSize: 24
+    fontSize: 24,
+    color: 'white'
   }
 });
 

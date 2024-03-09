@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren } from "react";
 import { StyleSheet } from "react-native";
-import HorizontalLinearGradient from "./HorizontalLinearGradient";
+import HorizontalLinearGradient from "../HorizontalLinearGradient";
 
 interface CardProps extends PropsWithChildren {
   colors?: (string | number) []

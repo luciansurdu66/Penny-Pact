@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.request.AuthRequest;
+import org.example.request.LoginRequest;
 import org.example.response.AuthResponse;
 import org.example.response.Response;
 import org.example.service.LoginService;
@@ -24,9 +24,9 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<Response> login(
-        @RequestBody AuthRequest loginRequest
+        @RequestBody LoginRequest loginRequest
     ) {
-        logger.info("login {}", loginRequest);
+        logger.info(loginRequest.toString());
 
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();

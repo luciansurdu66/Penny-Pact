@@ -1,6 +1,6 @@
 package org.example.request;
 
-public class AuthRequest {
+public class LoginRequest {
 
     private String email;
     private String password;
@@ -9,9 +9,11 @@ public class AuthRequest {
 
     @Override
     public String toString() {
-        return "{ email: " + email + ", " + "password: " + password + "}";
+        return "LoginRequest{" +
+                "email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
-
 
     // Getters and Setters
 

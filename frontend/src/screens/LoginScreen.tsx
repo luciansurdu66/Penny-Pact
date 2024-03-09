@@ -43,7 +43,11 @@ const LoginScreen: React.FC = () => {
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        <Icon name="user" size={15} color="#fff" style={styles.icon} />
+        <Icon 
+          name="user" 
+          size={16} 
+          color="#fff" 
+        />
       </View>
       <View style={styles.inputContainer}>
         <TextInput
@@ -54,8 +58,12 @@ const LoginScreen: React.FC = () => {
           onChangeText={setPassword}
           secureTextEntry={!isPasswordVisible}
         />
-        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.iconContainer}>
-          <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={15} color="#fff" />
+        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+          <Icon 
+            name={isPasswordVisible ? 'eye-slash' : 'eye'} 
+            size={16} 
+            color ="#fff"
+          />
         </TouchableOpacity>
       </View>
       {token && 
@@ -102,13 +110,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: 'Avenir',
     padding: 0,
-  },
-  iconContainer: {
-    padding: 10,
-  },
-  icon: {
-    color: '#fff',
-  },
+  }
 });
 
 export default LoginScreen;

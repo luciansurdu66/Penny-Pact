@@ -83,7 +83,7 @@ const SignUpScreen: React.FC = () => {
           onChangeText={setUsername}
           autoCapitalize="none"
         />
-        <Icon name="user" size={15} color="#fff" style={styles.icon} />
+        <Icon name="user" size={16} color="#fff" style={styles.icon} />
       </View>
       {usernameError && 
         <Text style={styles.errorText}>
@@ -100,7 +100,7 @@ const SignUpScreen: React.FC = () => {
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        <Icon name="envelope" size={15} color="#fff" style={styles.icon} />
+        <Icon name="envelope" size={16} color="#fff" style={styles.icon} />
       </View>
       {emailError && 
         <Text style={styles.errorText}>
@@ -116,8 +116,8 @@ const SignUpScreen: React.FC = () => {
           onChangeText={setPassword}
           secureTextEntry={!isPasswordVisible}
         />
-        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.iconContainer}>
-          <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={15} color="#fff" />
+        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+          <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={16} color="#fff" />
         </TouchableOpacity>
       </View>
       {passwordError && 
@@ -134,8 +134,8 @@ const SignUpScreen: React.FC = () => {
           onChangeText={setConfirmPassword}
           secureTextEntry={!isPasswordVisible}
         />
-        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.iconContainer}>
-          <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={15} color="#fff" />
+        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+          <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={16} color="#fff" />
         </TouchableOpacity>
       </View>
       {confirmPasswordError && 

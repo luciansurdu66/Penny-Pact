@@ -1,16 +1,19 @@
 import { StyleSheet, Text, View } from "react-native";
 import Card from "./Card";
+import Payment from "../../models/Payment";
 
 interface PaymentCardProps {
-  name: string,
-  date: Date,
-  user: string,
-  amount: number,
-};
+  payment: Payment;
+}
 
-const PaymentCard: React.FC<PaymentCardProps> = ({ name, date, user, amount }) => {
-  const day = date.getDay();
-  const month = date.toLocaleString('default', { month: 'long' });
+const PaymentCard: React.FC<PaymentCardProps> = ({ payment }) => {
+  const name = payment.name;
+  const user = payment.user;
+  const date = payment.date;
+  const amount = payment.amount;
+
+  const day = date.getDate();
+  const month = date.toLocaleString('default', { month: 'short' });
 
   return (
     <Card>
