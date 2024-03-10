@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -89,7 +90,7 @@ public class MockPaymentRepository implements PaymentRepository {
     }
 
     @Override
-    public Iterable<Payment> getAllByGroup(int groupId) {
+    public List<Payment> getAllByGroup(int groupId) {
         return expenses.values()
                 .stream()
                 .filter((e) -> e.getGroupId() == groupId)

@@ -1,7 +1,9 @@
 package org.example.controller;
 
+import org.example.dto.DebtDto;
+import org.example.dto.PaymentDto;
 import org.example.model.Debt;
-import org.example.model.Payment;
+import org.example.mapper.Mapper;
 import org.example.model.User;
 import org.example.service.*;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ public class UserSessionController {
     private final PaymentService paymentService;
     private final DebtService debtService;
     private final UserGroupService userGroupService;
+    private final Mapper mapper;
 
     public UserSessionController(
         TokenService tokenService,
@@ -28,7 +31,8 @@ public class UserSessionController {
         GroupService groupService,
         PaymentService paymentService,
         DebtService debtService,
-        UserGroupService userGroupService
+        UserGroupService userGroupService,
+        Mapper mapper
     ) {
         this.tokenService = tokenService;
         this.userService = userService;
@@ -36,6 +40,7 @@ public class UserSessionController {
         this.paymentService = paymentService;
         this.debtService = debtService;
         this.userGroupService = userGroupService;
+        this.mapper = mapper;
     }
 
     @GetMapping("/groups")
@@ -80,7 +85,10 @@ public class UserSessionController {
 
             // The user is authorized.
 
-            Iterable<Payment> groupPayments = paymentService.retrieveAllByGroup(groupId);
+            Iterable<PaymentDto> groupPayments = paymentService.retrieveAllByGroup(groupId)
+                .stream()
+                .map(mapper::toPaymentDto)
+                .toList();
 
             response = ResponseEntity.ok(groupPayments);
         } catch (JwtException ignored) {
@@ -113,7 +121,23 @@ public class UserSessionController {
 
             // The user is authorized.
 
-            Iterable<Debt> groupDebts = debtService.getByGroupId(groupId);
+            Iterable<DebtDto> groupDebts = debtService.getByGroupId(groupId)
+                .stream()
+                .map(debt -> {
+                    DebtDto debtDto = mapper.toDebtDto(debt);
+
+                    if (debt.getCreditorId() == user.getId()) {     // User is debtor.
+                        debtDto.setCreditor("You");
+                    }
+
+                    if (debt.getDebtorId() == user.getId()) {       // User is creditor.
+                        debtDto.setDebtor("You");
+                    }
+
+                    return debtDto;
+                })
+                .toList();
+
             response = ResponseEntity.ok(groupDebts);
         } catch (JwtException ignored) {
             response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
