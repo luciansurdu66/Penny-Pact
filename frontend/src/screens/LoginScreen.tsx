@@ -14,13 +14,14 @@ const LoginScreen: React.FC = () => {
   const { token, setToken } = useAuth();
 
   const handleLogin = useCallback(() => {
+    setErrorMessage('');
     AuthService.login(email, password)
       .then(response => { 
         setErrorMessage('');
         setToken(response.data.jwtToken);
       })
       .catch(error => {
-        setToken('');
+        setToken(null);
 
         if (!error.response) {
           setErrorMessage('Could not reach the server...');

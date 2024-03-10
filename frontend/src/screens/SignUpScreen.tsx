@@ -26,7 +26,7 @@ const SignUpScreen: React.FC = () => {
     setPasswordError('');
     setConfirmPasswordError('');
     setServerErrorMessage('');
-    setToken('');
+    setToken(null);
 
     // Validate fields and set errors if necessary
     if (username === '') {
@@ -58,7 +58,7 @@ const SignUpScreen: React.FC = () => {
           setToken(response.data.jwtToken);
         })
         .catch(error => {
-          setToken('');
+          setToken(null);
 
           if (!error.response) {
             setServerErrorMessage('Could not reach the server...');
