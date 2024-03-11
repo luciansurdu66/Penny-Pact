@@ -1,13 +1,18 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { ActivityIndicator, ListRenderItem, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import GroupItem from "../components/GroupItem";
-import Icon from "react-native-vector-icons/Feather";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Banner from "../components/Banner";
 import { useApp } from "../providers/AppProvider";
 import Group from "../models/Group";
+import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParamList } from "../navigation/AppNavigator";
+import SearchBar from "../components/SearchBar";
 
-const GroupListScreen: FC = () => {
+type GroupListScreenProps = StackScreenProps<RootStackParamList, 'GroupList'>;
+
+const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
   const { 
     groups, 
     isFetchingGroups, 
@@ -15,14 +20,22 @@ const GroupListScreen: FC = () => {
   } = useApp();
 
   const renderItem: ListRenderItem<Group> = ({ item }) => {
-    return (<GroupItem name={item.name} />);
-  }
+    return (<GroupItem name={item.name} onPress={ () => onGroupItemPress(item.id) } />);
+  };
+
+  // States
+
+  const [searchValue, setSearchValue] = useState('');
 
   // Effects
 
   useEffect(() => {
     fetchGroups();
   }, []);
+
+  const filteredGroups = groups.filter(group => 
+    group.name.toLowerCase().startsWith(searchValue.toLowerCase())
+  );
 
   return (
     <View style={styles.wrapper}>
@@ -32,20 +45,41 @@ const GroupListScreen: FC = () => {
           <Text style={styles.header}>Fetching the groups...</Text>
         </View>
       )}
-      <Banner />
+      <Banner>
+        <View style={styles.bannerContent}>
+          <TouchableOpacity>
+            <Icon 
+              name="microsoft-xbox-controller-menu"
+              size={64}
+              color="black"
+            />
+            </TouchableOpacity>
+            <SearchBar 
+              value={searchValue} 
+              editable={groups.length > 0}
+              onChangeText={(newSearchValue) => setSearchValue(newSearchValue)} 
+            />
+        </View>
+      </Banner>
       <View style={styles.content}>
         {!isFetchingGroups && (
           <View style={styles.list}>
             {groups.length > 0 ? (
-              <FlatList 
-                data={groups}
-                renderItem={renderItem}
-              />
+              filteredGroups.length > 0 ? (
+                <FlatList 
+                  data={filteredGroups}
+                  renderItem={renderItem}
+                />
+              ) : (
+                <View style={styles.centeredContainer}>
+                  <Text style={styles.text}>No matches found...</Text>
+                </View>
+              )
             ) : (
-              <>
-                <Text style={styles.header}>You're not part of any group</Text>
-                <Text style={styles.header}>:(</Text>
-              </>
+              <View style={styles.centeredContainer}>
+                <Text style={styles.header}>You're not part of any group...</Text>
+                <Text style={styles.text}>Don't worry, you can always create a new group by pressing the add button! 👇🏻</Text>
+              </View>
             )}
           </View>
         )}
@@ -55,6 +89,12 @@ const GroupListScreen: FC = () => {
       </View>
     </View>
   );
+
+  // Functions
+
+  function onGroupItemPress(groupId: number) {
+    navigation.navigate('Group', { groupId });
+  };
 }
 
 const styles = StyleSheet.create({
@@ -97,7 +137,20 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    color: 'black'
+    color: 'white',
+    textAlign: 'center'
+  },
+  centeredContainer: {
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8
+  },
+  bannerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 16
   },
 });
 

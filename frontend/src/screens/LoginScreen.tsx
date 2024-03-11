@@ -4,8 +4,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import GradientButton from '../components/GradientButton';
 import AuthService from '../services/AuthService';
 import { useAuth } from '../providers/AuthProvider';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-const LoginScreen: React.FC = () => {
+type LoginScreenParams = StackScreenProps<RootStackParamList, 'Login'>;
+
+const LoginScreen: React.FC<LoginScreenParams> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -40,7 +44,7 @@ const LoginScreen: React.FC = () => {
           placeholder="Email"
           placeholderTextColor="#fff"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(newEmail) => { setEmail(newEmail.trim()) }}
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -56,7 +60,7 @@ const LoginScreen: React.FC = () => {
           placeholder="Password"
           placeholderTextColor="#fff"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(newPassword) => setPassword(newPassword.trim())}
           secureTextEntry={!isPasswordVisible}
         />
         <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
@@ -67,9 +71,6 @@ const LoginScreen: React.FC = () => {
           />
         </TouchableOpacity>
       </View>
-      {token && 
-        <Text>{token}</Text>
-      }
       {errorMessage && 
         <Text style={{ color: "red" }}>
           {errorMessage}

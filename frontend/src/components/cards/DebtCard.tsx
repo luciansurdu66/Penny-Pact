@@ -2,6 +2,7 @@ import { FC } from "react";
 import Card from "./Card";
 import { StyleSheet, Text, View } from "react-native";
 import Debt from "../../models/Debt";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface DebtCardProps {
   debt: Debt;
@@ -16,21 +17,23 @@ const DebtCard: FC<DebtCardProps> = ({ debt }) => {
   const isUserCreditor = debt.creditor.toLowerCase() == 'you';
 
   return (
-    <Card>
-      <View style={styles.wrapper}>
-        <View>
-          <Text style={styles.text}>
-            <Text style={!isUserDebtor && { fontWeight: 'bold' }}>{debtor} </Text>
-            <Text>{isUserDebtor ? 'owe' : 'owes'} </Text>
-            <Text style={!isUserCreditor && { fontWeight: 'bold' }}>{creditor}</Text>
-          </Text>
+    <TouchableOpacity>
+      <Card>
+        <View style={styles.wrapper}>
+          <View>
+            <Text style={styles.text}>
+              <Text style={!isUserDebtor && { fontWeight: 'bold' }}>{debtor} </Text>
+              <Text>{isUserDebtor ? 'owe' : 'owes'} </Text>
+              <Text style={!isUserCreditor && { fontWeight: 'bold' }}>{creditor}</Text>
+            </Text>
+          </View>
+          <View style={styles.amountWrapper}>
+            <Text style={styles.header}>{amount}</Text>
+            <Text style={styles.text}>RON</Text>
+          </View>
         </View>
-        <View style={styles.amountWrapper}>
-          <Text style={styles.header}>{amount}</Text>
-          <Text style={styles.text}>RON</Text>
-        </View>
-      </View>
-    </Card>
+      </Card>
+    </TouchableOpacity>
   );
 }
 

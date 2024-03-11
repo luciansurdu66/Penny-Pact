@@ -2,14 +2,15 @@ import { FC } from "react";
 import { Image, StyleSheet, Text, TouchableNativeFeedback, View } from "react-native";
 
 interface GroupItemProps {
-  name: string
+  name: string;
+  onPress: () => void;
 }
 
-const GroupItem: FC<GroupItemProps> = ({ name }) => {
+const GroupItem: FC<GroupItemProps> = ({ name, onPress }) => {
   const defaultGroupImage = '../../assets/images/landscape.jpg';
 
   return (
-    <TouchableNativeFeedback>
+    <TouchableNativeFeedback onPress={onPress}>
       <View style={styles.wrapper}>
         <Image source={require(defaultGroupImage)} style={styles.image} />
         <Text style={styles.name}>{name}</Text>

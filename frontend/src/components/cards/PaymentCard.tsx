@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import Card from "./Card";
 import Payment from "../../models/Payment";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface PaymentCardProps {
   payment: Payment;
@@ -16,36 +17,38 @@ const PaymentCard: React.FC<PaymentCardProps> = ({ payment }) => {
   const month = date.toLocaleString('default', { month: 'short' });
 
   return (
-    <Card>
-      <View style={styles.wrapper}>
-        <View 
-          style={{ 
-            flexDirection: 'row',
-            alignItems: 'center', 
-            gap: 16 
-          }}
-        >
-          <View style={{ alignItems: 'center' }}>
-            <Text style={styles.text}>{month}</Text>
-            <Text style={styles.text}>{day}</Text>
+    <TouchableOpacity>
+      <Card>
+        <View style={styles.wrapper}>
+          <View 
+            style={{ 
+              flexDirection: 'row',
+              alignItems: 'center', 
+              gap: 16 
+            }}
+          >
+            <View style={{ alignItems: 'center' }}>
+              <Text style={styles.text}>{month}</Text>
+              <Text style={styles.text}>{day}</Text>
+            </View>
+            <View>
+              <Text style={styles.header}>{name}</Text>
+              <Text style={styles.text}>{user}</Text> 
+            </View>
           </View>
-          <View>
-            <Text style={styles.header}>{name}</Text>
-            <Text style={styles.text}>{user}</Text> 
+          <View 
+            style={{ 
+              flexDirection: 'row',
+              gap: 8,
+              alignItems: 'center'
+            }}
+          >
+            <Text style={styles.header}>{amount.toFixed(2)}</Text>
+            <Text style={styles.text}>RON</Text>
           </View>
         </View>
-        <View 
-          style={{ 
-            flexDirection: 'row',
-            gap: 8,
-            alignItems: 'center'
-          }}
-        >
-          <Text style={styles.header}>{amount.toFixed(2)}</Text>
-          <Text style={styles.text}>RON</Text>
-        </View>
-      </View>
-    </Card>
+      </Card>
+    </TouchableOpacity>
   )
 };
 

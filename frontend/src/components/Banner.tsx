@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from "react";
-import { Image, ImageBackground, StyleSheet, View } from "react-native";
+import { Image, ImageBackground, StyleSheet } from "react-native";
 
 const Banner: FC<PropsWithChildren> = ({ children }) => {
   const defaultBackgroundImage = '../../assets/images/banner.jpg';
@@ -8,7 +8,7 @@ const Banner: FC<PropsWithChildren> = ({ children }) => {
     <ImageBackground
         style={styles.wrapper}
         source={require(defaultBackgroundImage)}
-        resizeMode="repeat" 
+        resizeMode="repeat"
       >
         { children }
     </ImageBackground>

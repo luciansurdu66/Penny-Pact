@@ -4,43 +4,57 @@ import HomeScreen from "../screens/HomeScreen";
 import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import { useAuth } from "../providers/AuthProvider";
-import { AppProvider } from "../providers/AppProvider";
 import GroupListScreen from "../screens/GroupListScreen";
+import GroupScreen from "../screens/GroupScreen";
 
-const Stack = createStackNavigator();
+type RootStackParamList = {
+  Home: undefined;
+  Login: undefined;
+  SignUp: undefined;
+  GroupList: undefined; 
+  Group: { groupId: number };
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator: FC = () => {
   const { token } = useAuth();
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {token == null ? (
         <>
           <Stack.Screen 
-            name="Home" 
+            name='Home'
             component={HomeScreen}
-            options={{ headerShown: false }}
           />
           <Stack.Screen 
-            name="Login" 
+            name='Login' 
             component={LoginScreen}
-            options={{ headerShown: false }}
           />
           <Stack.Screen 
-            name="SignUp" 
+            name='SignUp'
             component={SignUpScreen}
-            options={{ headerShown: false }}
           />
         </>
       ) : (
+        <>
           <Stack.Screen 
-            name="GroupList" 
+            name='GroupList'
             component={GroupListScreen}
-            options={{headerShown: false}}
           />
+          <Stack.Screen
+            name='Group'
+            component={GroupScreen}
+          />
+        </>
       )}
     </Stack.Navigator>
   );  
 };
 
-export default AppNavigator;
+export {
+  AppNavigator
+};
+
+export type { RootStackParamList };

@@ -1,5 +1,5 @@
-import { FC, useState } from "react";
-import { ListRenderItem, StyleSheet, Text, View } from "react-native";
+import { FC, useEffect, useState } from "react";
+import { ActivityIndicator, ListRenderItem, StyleSheet, Text, View } from "react-native";
 import Banner from "../components/Banner";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
@@ -8,21 +8,38 @@ import Payment from "../models/Payment";
 import PaymentCard from "../components/cards/PaymentCard";
 import Debt from "../models/Debt";
 import DebtCard from "../components/cards/DebtCard";
+import { useApp } from "../providers/AppProvider";
+import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParamList } from "../navigation/AppNavigator";
 
-interface GroupScreenProps {
-  name: string;
-  payments: (Payment)[];
-  debts: (Debt)[];
-}
+type GroupScreenProps = StackScreenProps<RootStackParamList, 'Group'>;
 
-const GroupScreen: FC<GroupScreenProps> = ({ name, payments, debts }) => { 
+const GroupScreen: FC<GroupScreenProps> = ({ route }) => {
+  // Contexts
+
+  const { 
+    groups, 
+    groupPayments: payments, 
+    groupDebts: debts,
+    isFecthingGroupDetails: isFetchingGroupDetails,
+    fetchGroupDetails
+  } = useApp();
+  
+  // States
+  
   const [showPayments, setShowPayments] = useState(true);
-
+  
+  const groupId = route.params.groupId;
+  const groupName = groups[groupId - 1]?.name ?? 'Unknown';
   const menuItems = ['Payments', 'Debts'];
+
   const menuItemsCallbacks: (() => void)[] = [
     () => { setShowPayments(true) },
     () => { setShowPayments(false) }
   ];
+
+  // Renderes
+  // Flat List Renderes
 
   const renderPayment: ListRenderItem<Payment> = ({ item: payment, index }) => {
     return (
@@ -42,6 +59,31 @@ const GroupScreen: FC<GroupScreenProps> = ({ name, payments, debts }) => {
     );
   }
 
+  // Component Renderes
+
+  const renderContent = (data: (any)[], renderItem: any, emptyText: string) => {
+    return data.length > 0 ? (
+      <FlatList 
+        contentContainerStyle={{ gap: 16 }}
+        data={data}
+        renderItem={renderItem}
+      />
+    ) : (
+      <View style={styles.centeredContainer}>
+        <Text style={styles.text}>{emptyText}</Text>
+      </View>
+    );
+  };
+  
+  const renderPayments = () => renderContent(payments, renderPayment, 'The group has no payments.');
+  const renderDebts = () => renderContent(debts, renderDebt, 'There are no debts in this group.');
+
+  // Effects
+
+  useEffect(() => {
+    fetchGroupDetails(groupId);
+  }, []);
+
   return (
     <View style={styles.wrapper}>
       <Banner>
@@ -53,24 +95,20 @@ const GroupScreen: FC<GroupScreenProps> = ({ name, payments, debts }) => {
               color="black"
             />
           </TouchableOpacity>
-          <Text style={styles.header}>{name}</Text>
+          <Text style={styles.header}>{groupName}</Text>
         </View>
       </Banner>
       <RowMenu items={menuItems} onPressCallbacks={menuItemsCallbacks} />
       <View style={styles.content}>
         <View>
-        {showPayments
-          ? <FlatList 
-              contentContainerStyle={{ gap: 16 }} 
-              data={payments} 
-              renderItem={renderPayment} 
-            />
-          : <FlatList 
-              contentContainerStyle={{ gap: 16 }}
-              data={debts}
-              renderItem={renderDebt}
-            />
-        }
+        {isFetchingGroupDetails ? (
+          <View style={styles.centeredContainer}>
+            <ActivityIndicator color={'white'} />
+            <Text style={styles.text}>Fetching group details...</Text>
+          </View>
+        ) : (
+          showPayments ? renderPayments() : renderDebts()
+        )}
         </View>
       </View>
     </View>
@@ -79,7 +117,8 @@ const GroupScreen: FC<GroupScreenProps> = ({ name, payments, debts }) => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    height: '100%'
+    height: '100%',
+    backgroundColor: 'black'
   },
   bannerContent: {
     flexDirection: 'row',
@@ -93,6 +132,16 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 16,
+  },
+  text: {
+    fontSize: 16,
+    color: 'white'
+  },
+  centeredContainer: {
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8
   }
 });
 
