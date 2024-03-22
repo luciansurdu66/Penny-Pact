@@ -21,7 +21,7 @@ const SignUpScreen: React.FC<SignUpScreenParams> = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [serverErrorMessage, setServerErrorMessage] = useState('');
 
-  const { token, setToken } = useAuth();
+  const { setToken } = useAuth();
 
   const handleSignUp = () => {
     // Reset errors
@@ -57,18 +57,28 @@ const SignUpScreen: React.FC<SignUpScreenParams> = () => {
       password === confirmPassword
     ) {   // Signup logic.
       AuthService.signUp(username, email, password)
-        .then(response => { 
+        .then(response => {
+          const jwtToken = response.data.jwtToken;
+
           setServerErrorMessage('');
-          setToken(response.data.jwtToken);
+          setToken(jwtToken);
+
+          console.info('Sign-Up Response', { status: 'Success', jwtToken });
         })
         .catch(error => {
           setToken(null);
 
+          let errorMessage;
+
           if (!error.response) {
-            setServerErrorMessage('Could not reach the server...');
+            errorMessage = 'Could not reach the server...';
           } else {
-            setServerErrorMessage(error.response.data.message);
+            errorMessage = error.response.data.message;
           }
+
+          setServerErrorMessage(errorMessage);
+
+          console.info('Sign-Up Response', { status: 'Failed', error: errorMessage });
         });
     }
   };

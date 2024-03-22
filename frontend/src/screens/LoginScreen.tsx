@@ -15,23 +15,35 @@ const LoginScreen: React.FC<LoginScreenParams> = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const { token, setToken } = useAuth();
+  const { setToken } = useAuth();
 
   const handleLogin = useCallback(() => {
     setErrorMessage('');
     AuthService.login(email, password)
-      .then(response => { 
+    .then(response => { 
+        const jwtToken = response.data.jwtToken;
+
         setErrorMessage('');
-        setToken(response.data.jwtToken);
+        setToken(jwtToken);
+
+        console.info('Login Response', { status: 'Success', jwtToken });
       })
       .catch(error => {
         setToken(null);
 
+        let errorMessage;
+
         if (!error.response) {
-          setErrorMessage('Could not reach the server...');
+          errorMessage = 'Could not reach the server...';
+          console.info('Could not reach the server');
         } else {
+          errorMessage = 'Invalid credentials';
           setErrorMessage('Invalid credentials');
         }
+
+        setErrorMessage(errorMessage);
+
+        console.info('Login Response', { status: 'Failed', error: errorMessage });
       });
   }, [email, password]);
 

@@ -42,11 +42,21 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
     await new Promise(resolve => setTimeout(resolve, 1000)); 
     
     UserSessionService.fetchAllGroups(token)
-      .then(response => dispatch({ 
-        type: ActionType.FETCH_GROUPS_SUCCEDED,
-        payload: { groups: response.data }
-      }))
-      .catch(() => setToken(null));
+      .then(response => {
+        const groups = response.data;
+
+        dispatch({ 
+          type: ActionType.FETCH_GROUPS_SUCCEDED,
+          payload: { groups }
+        });
+        
+        console.info('Fetch Groups Response', groups);
+      })
+      .catch(() => {
+        setToken(null);
+
+        console.info('Fetch Group Response', { status: 'Failed', message: 'Loggin out...' });
+      });
   }
 
   async function fetchGroupDetailsCallback(groupId: number) {
@@ -57,13 +67,15 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
 
     try {
       let groupPayments = (await UserSessionService.fetchPaymentsByGroupId(token, groupId)).data;
-      const groupDebts = (await UserSessionService.fetchDebtsByGroupId(token, groupId)).data;
 
       groupPayments = groupPayments.map((payment: any) => (
         { ...payment, date: DateFormater.fromJavaLocalDateStr(payment.date) }
       ));
+      console.info(`Fetch Group ${groupId} Payments Response`, groupPayments);
 
-      console.info({ groupPayments }, { groupDebts });
+      const groupDebts = (await UserSessionService.fetchDebtsByGroupId(token, groupId)).data;
+
+      console.info(`Fetch Group ${groupId} Debts Response`, groupDebts);
 
       dispatch({
         type: ActionType.FETCH_GROUP_DETAILS_SUCCEDED,
@@ -73,8 +85,8 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
         }
       });
     } catch (error) {
-      console.info(error);
       setToken(null);
+      console.info(`Fetch Group ${groupId} Payments/Debts Response`, { status: 'Failed', message: 'Logging out...' });
     }
   }
 };

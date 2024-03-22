@@ -4,18 +4,32 @@ import AppConfig from "../configurations/AppConfig";
 class UserSessionService {
   static async fetchAllGroups(token) {
     const groupsUrl = AppConfig.baseUrl + "/user/groups";
-    return axios.get(groupsUrl, { headers: { Authorization: token }, timeout: 1000 });
+    const headers = { Authorization: token };
+    const fetchGroupsRequest = { headers, timeout: 1000 }; 
+
+    console.info('Fetch Groups Request');
+
+    return axios.get(groupsUrl, fetchGroupsRequest);
   }
 
   static async fetchPaymentsByGroupId(token, groupId) {
-    console.info(groupId);
     const groupPaymentsUrl = AppConfig.baseUrl + `/user/group/${groupId}/payments`;
-    return axios.get(groupPaymentsUrl, { headers: { Authorization: token }, timeout: 1000 });
+    const headers = { Authorization: token };
+    const fetchGroupPaymentsRequest = { headers, timeout: 1000 };
+
+    console.info(`Fetch Group ${groupId} Payments Request`);
+
+    return axios.get(groupPaymentsUrl, fetchGroupPaymentsRequest);
   }
 
   static async fetchDebtsByGroupId(token, groupId) {
     const groupDebtsUrl = AppConfig.baseUrl + `/user/group/${groupId}/debts`;
-    return axios.get(groupDebtsUrl, { headers: { Authorization: token }, timeout: 1000 });
+    const headers = { Authorization: token };
+    const fetchGroupDebtsRequest = { headers, timeout: 1000 };
+
+    console.info(`Fetch Group ${groupId} Debts Request`);
+
+    return axios.get(groupDebtsUrl, fetchGroupDebtsRequest);
   }
 }
 
