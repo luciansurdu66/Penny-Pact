@@ -35,10 +35,8 @@ const LoginScreen: React.FC<LoginScreenParams> = () => {
 
         if (!error.response) {
           errorMessage = 'Could not reach the server...';
-          console.info('Could not reach the server');
         } else {
           errorMessage = 'Invalid credentials';
-          setErrorMessage('Invalid credentials');
         }
 
         setErrorMessage(errorMessage);
