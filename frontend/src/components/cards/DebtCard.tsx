@@ -1,8 +1,7 @@
 import { FC } from "react";
 import Card from "./Card";
-import { StyleSheet, Text, View } from "react-native";
+import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
 import Debt from "../../models/Debt";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface DebtCardProps {
   debt: Debt;

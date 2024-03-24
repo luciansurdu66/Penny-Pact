@@ -1,16 +1,15 @@
 import { FC, useEffect, useState } from "react";
-import { ActivityIndicator, ListRenderItem, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, ActivityIndicator, ListRenderItem, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import GroupItem from "../components/GroupItem";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Banner from "../components/Banner";
 import { useApp } from "../providers/AppProvider";
 import Group from "../models/Group";
-import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import SearchBar from "../components/SearchBar";
+import { DrawerScreenProps } from "@react-navigation/drawer";
 
-type GroupListScreenProps = StackScreenProps<RootStackParamList, 'GroupList'>;
+type GroupListScreenProps = DrawerScreenProps<RootStackParamList, 'GroupList'>;
 
 const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
   const { 
@@ -20,7 +19,7 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
   } = useApp();
 
   const renderItem: ListRenderItem<Group> = ({ item }) => {
-    return (<GroupItem name={item.name} onPress={ () => onGroupItemPress(item.id) } />);
+    return (<GroupItem name={item.name} onPress={ () => handleGroupItemPress(item.id) } />);
   };
 
   // States
@@ -47,7 +46,7 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
       )}
       <Banner>
         <View style={styles.bannerContent}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleMenuButtonPress}>
             <Icon 
               name="microsoft-xbox-controller-menu"
               size={64}
@@ -92,7 +91,11 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
 
   // Functions
 
-  function onGroupItemPress(groupId: number) {
+  function handleMenuButtonPress() {
+    navigation.openDrawer();
+  }
+
+  function handleGroupItemPress(groupId: number) {
     navigation.navigate('Group', { groupId });
   };
 }

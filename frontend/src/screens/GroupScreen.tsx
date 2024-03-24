@@ -1,20 +1,20 @@
 import { FC, useEffect, useState } from "react";
-import { ActivityIndicator, ListRenderItem, StyleSheet, Text, View } from "react-native";
+import { FlatList, ActivityIndicator, ListRenderItem, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Banner from "../components/Banner";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import RowMenu from "../components/RowMenu";
 import Payment from "../models/Payment";
 import PaymentCard from "../components/cards/PaymentCard";
 import Debt from "../models/Debt";
 import DebtCard from "../components/cards/DebtCard";
 import { useApp } from "../providers/AppProvider";
-import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
+import { DrawerScreenProps } from "@react-navigation/drawer";
 
-type GroupScreenProps = StackScreenProps<RootStackParamList, 'Group'>;
+type GroupScreenProps = DrawerScreenProps<RootStackParamList, 'Group'>;
 
-const GroupScreen: FC<GroupScreenProps> = ({ route }) => {
+const GroupScreen: FC<GroupScreenProps> = ({ navigation, route }) => {
+  
   // Contexts
 
   const { 
@@ -88,7 +88,7 @@ const GroupScreen: FC<GroupScreenProps> = ({ route }) => {
     <View style={styles.wrapper}>
       <Banner>
         <View style={styles.bannerContent}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleMenuButtonPress}>
             <Icon 
               name="microsoft-xbox-controller-menu"
               size={64}
@@ -112,7 +112,13 @@ const GroupScreen: FC<GroupScreenProps> = ({ route }) => {
         </View>
       </View>
     </View>
-  )
+  );
+
+  // Functions
+
+  function handleMenuButtonPress() {
+    navigation.openDrawer();
+  }
 }
 
 const styles = StyleSheet.create({

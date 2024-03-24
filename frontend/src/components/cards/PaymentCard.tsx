@@ -1,7 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
+import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
 import Card from "./Card";
 import Payment from "../../models/Payment";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface PaymentCardProps {
   payment: Payment;

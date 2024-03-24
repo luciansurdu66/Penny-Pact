@@ -1,6 +1,5 @@
 import { FC } from "react";
-import { StyleSheet, View } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+import { TextInput, StyleSheet, View } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 
 interface SearchBarProps {
