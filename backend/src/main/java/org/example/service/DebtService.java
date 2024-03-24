@@ -5,6 +5,8 @@ import org.example.repository.DebtRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class DebtService {
 
@@ -16,7 +18,7 @@ public class DebtService {
         this.debtRepository = debtRepository;
     }
 
-    public Iterable<Debt> getByGroupId(int groupId) {
+    public List<Debt> getByGroupId(int groupId) {
         return debtRepository.findByGroupId(groupId);
     }
 }

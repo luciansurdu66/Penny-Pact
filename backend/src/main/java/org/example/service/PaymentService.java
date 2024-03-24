@@ -1,43 +1,46 @@
 package org.example.service;
 
+import org.example.dto.PaymentDto;
 import org.example.model.Payment;
 import org.example.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PaymentService {
 
-    PaymentRepository expenseRepository;
+    PaymentRepository paymentRepository;
 
     public PaymentService(
         @Qualifier("mockPaymentRepository") PaymentRepository _expenseRepository
     ) {
-        expenseRepository = _expenseRepository;
+        paymentRepository = _expenseRepository;
     }
 
 
     public void saveExpense(Payment expense) {
-        expenseRepository.save(expense);
+        paymentRepository.save(expense);
     }
 
     public void removeExpense(Integer id) {
-        expenseRepository.remove(id);
+        paymentRepository.remove(id);
     }
 
     public void updateExpense(Payment expense) {
-        expenseRepository.update(expense);
+        paymentRepository.update(expense);
     }
 
     public Iterable<Payment> getAll() {
-        return expenseRepository.findAll();
+        return paymentRepository.findAll();
     }
 
-    public Iterable<Payment> retrieveAllByGroup(int groupID) {
-        return expenseRepository.getAllByGroup(groupID);
+    public List<Payment> retrieveAllByGroup(int groupID) {
+        return paymentRepository.getAllByGroup(groupID);
     }
 
     public Payment getById(Integer id) {
-        return expenseRepository.findById(id);
+        return paymentRepository.findById(id);
     }
 }

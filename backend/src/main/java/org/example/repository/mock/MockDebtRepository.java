@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -42,7 +43,7 @@ public class MockDebtRepository implements DebtRepository {
     }
 
     @Override
-    public Iterable<Debt> findByGroupId(int groupId) {
+    public List<Debt> findByGroupId(int groupId) {
         return debts.values()
             .stream()
             .filter(debt -> debt.getGroupId() == groupId)

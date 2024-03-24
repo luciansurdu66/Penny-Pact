@@ -4,8 +4,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import GradientButton from '../components/GradientButton';
 import { useAuth } from '../providers/AuthProvider';
 import AuthService from '../services/AuthService';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-const SignUpScreen: React.FC = () => {
+type SignUpScreenParams = StackScreenProps<RootStackParamList, 'SignUp'>;
+
+const SignUpScreen: React.FC<SignUpScreenParams> = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,7 +21,7 @@ const SignUpScreen: React.FC = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [serverErrorMessage, setServerErrorMessage] = useState('');
 
-  const { token, setToken } = useAuth();
+  const { setToken } = useAuth();
 
   const handleSignUp = () => {
     // Reset errors
@@ -25,6 +29,8 @@ const SignUpScreen: React.FC = () => {
     setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
+    setServerErrorMessage('');
+    setToken(null);
 
     // Validate fields and set errors if necessary
     if (username === '') {
@@ -51,18 +57,28 @@ const SignUpScreen: React.FC = () => {
       password === confirmPassword
     ) {   // Signup logic.
       AuthService.signUp(username, email, password)
-        .then(response => { 
+        .then(response => {
+          const jwtToken = response.data.jwtToken;
+
           setServerErrorMessage('');
-          setToken(response.data.jwtToken);
+          setToken(jwtToken);
+
+          console.info('Sign-Up Response', { status: 'Success', jwtToken });
         })
         .catch(error => {
-          setToken('');
+          setToken(null);
+
+          let errorMessage;
 
           if (!error.response) {
-            setServerErrorMessage('Could not reach the server...');
+            errorMessage = 'Could not reach the server...';
           } else {
-            setServerErrorMessage(error.response.data.message);
+            errorMessage = error.response.data.message;
           }
+
+          setServerErrorMessage(errorMessage);
+
+          console.info('Sign-Up Response', { status: 'Failed', error: errorMessage });
         });
     }
   };
@@ -78,10 +94,10 @@ const SignUpScreen: React.FC = () => {
           placeholder="Username"
           placeholderTextColor="#fff"
           value={username}
-          onChangeText={setUsername}
+          onChangeText={(newUsername) => { setUsername(newUsername.trim()) }}
           autoCapitalize="none"
         />
-        <Icon name="user" size={15} color="#fff" style={styles.icon} />
+        <Icon name="user" size={16} color="#fff" style={styles.icon} />
       </View>
       {usernameError && 
         <Text style={styles.errorText}>
@@ -94,11 +110,11 @@ const SignUpScreen: React.FC = () => {
           placeholder="Email"
           placeholderTextColor="#fff"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(newEmail) => { setEmail(newEmail.trim()) }}
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        <Icon name="envelope" size={15} color="#fff" style={styles.icon} />
+        <Icon name="envelope" size={16} color="#fff" style={styles.icon} />
       </View>
       {emailError && 
         <Text style={styles.errorText}>
@@ -111,11 +127,11 @@ const SignUpScreen: React.FC = () => {
           placeholder="Password"
           placeholderTextColor="#fff"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(newPassword) => { setPassword(newPassword.trim()) }}
           secureTextEntry={!isPasswordVisible}
         />
-        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.iconContainer}>
-          <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={15} color="#fff" />
+        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+          <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={16} color="#fff" />
         </TouchableOpacity>
       </View>
       {passwordError && 
@@ -129,11 +145,11 @@ const SignUpScreen: React.FC = () => {
           placeholder="Confirm Password"
           placeholderTextColor="#fff"
           value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          onChangeText={(newConfirmPassword) => { setConfirmPassword(newConfirmPassword.trim()) }}
           secureTextEntry={!isPasswordVisible}
         />
-        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.iconContainer}>
-          <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={15} color="#fff" />
+        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+          <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={16} color="#fff" />
         </TouchableOpacity>
       </View>
       {confirmPasswordError && 
@@ -145,9 +161,6 @@ const SignUpScreen: React.FC = () => {
         <Text style={styles.errorText}>
           {serverErrorMessage}
         </Text>
-      }
-      {token && 
-        <Text>{token}</Text>
       }
       <GradientButton title="Sign Up" onPress={handleSignUp} />
     </View>
