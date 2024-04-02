@@ -4,29 +4,44 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import GradientButton from '../components/GradientButton';
 import AuthService from '../services/AuthService';
 import { useAuth } from '../providers/AuthProvider';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-const LoginScreen: React.FC = () => {
+type LoginScreenParams = StackScreenProps<RootStackParamList, 'Login'>;
+
+const LoginScreen: React.FC<LoginScreenParams> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const { token, setToken } = useAuth();
+  const { setToken } = useAuth();
 
   const handleLogin = useCallback(() => {
+    setErrorMessage('');
     AuthService.login(email, password)
-      .then(response => { 
+    .then(response => { 
+        const jwtToken = response.data.jwtToken;
+
         setErrorMessage('');
-        setToken(response.data.jwtToken);
+        setToken(jwtToken);
+
+        console.info('Login Response', { status: 'Success', jwtToken });
       })
       .catch(error => {
-        setToken('');
+        setToken(null);
+
+        let errorMessage;
 
         if (!error.response) {
-          setErrorMessage('Could not reach the server...');
+          errorMessage = 'Could not reach the server...';
         } else {
-          setErrorMessage('Invalid credentials');
+          errorMessage = 'Invalid credentials';
         }
+
+        setErrorMessage(errorMessage);
+
+        console.info('Login Response', { status: 'Failed', error: errorMessage });
       });
   }, [email, password]);
 
@@ -39,11 +54,15 @@ const LoginScreen: React.FC = () => {
           placeholder="Email"
           placeholderTextColor="#fff"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(newEmail) => { setEmail(newEmail.trim()) }}
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        <Icon name="user" size={15} color="#fff" style={styles.icon} />
+        <Icon 
+          name="user" 
+          size={16} 
+          color="#fff" 
+        />
       </View>
       <View style={styles.inputContainer}>
         <TextInput
@@ -51,16 +70,17 @@ const LoginScreen: React.FC = () => {
           placeholder="Password"
           placeholderTextColor="#fff"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(newPassword) => setPassword(newPassword.trim())}
           secureTextEntry={!isPasswordVisible}
         />
-        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.iconContainer}>
-          <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={15} color="#fff" />
+        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+          <Icon 
+            name={isPasswordVisible ? 'eye-slash' : 'eye'} 
+            size={16} 
+            color ="#fff"
+          />
         </TouchableOpacity>
       </View>
-      {token && 
-        <Text>{token}</Text>
-      }
       {errorMessage && 
         <Text style={{ color: "red" }}>
           {errorMessage}
@@ -102,13 +122,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: 'Avenir',
     padding: 0,
-  },
-  iconContainer: {
-    padding: 10,
-  },
-  icon: {
-    color: '#fff',
-  },
+  }
 });
 
 export default LoginScreen;

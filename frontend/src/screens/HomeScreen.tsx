@@ -1,17 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import GradientButton from '../components/GradientButton';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-const HomePage: React.FC = () => {
-  const navigation = useNavigation();
+type HomeScreenProps = StackScreenProps<RootStackParamList, 'Home'>;
 
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Penny Pact</Text>
       <View style={styles.buttonContainer}>
-        <GradientButton title="Go to Login" onPress={() => navigation.navigate('Login' as never)} />
-        <GradientButton title="Go to Sign Up" onPress={() => navigation.navigate('Signup' as never)} />
+        <GradientButton title="Go to Login" onPress={() => navigation.navigate('Login')} />
+        <GradientButton title="Go to Sign Up" onPress={() => navigation.navigate('SignUp')} />
       </View>
     </View>
   );
@@ -36,4 +37,4 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
 });
-export default HomePage;
+export default HomeScreen;

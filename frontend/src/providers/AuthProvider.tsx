@@ -1,8 +1,8 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 
 interface AuthContextProps {
-  token: string,
-  setToken: (newToken: string) => void
+  token: string | null,
+  setToken: (newToken: string | null) => void
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -11,17 +11,17 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [token, setToken] = useState('');
+const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(null);
 
   return (
     <AuthContext.Provider value={{ token, setToken }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export const useAuth = (): AuthContextProps => {
+const useAuth = (): AuthContextProps => {
   const context = useContext(AuthContext);
   
   if (!context) {
@@ -29,4 +29,9 @@ export const useAuth = (): AuthContextProps => {
   }
 
   return context;
+};
+
+export { 
+  AuthProvider,
+  useAuth
 }

@@ -2,6 +2,8 @@ package org.example.repository;
 
 import org.example.model.Debt;
 
+import java.util.List;
+
 public interface DebtRepository extends Repository<Debt, Integer> {
 
     /**
@@ -9,5 +11,5 @@ public interface DebtRepository extends Repository<Debt, Integer> {
      * @param groupId The id of the group.
      * @return The debts for the given group.
      */
-    Iterable<Debt> findByGroupId(int groupId);
+    List<Debt> findByGroupId(int groupId);
 }

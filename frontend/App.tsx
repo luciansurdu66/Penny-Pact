@@ -1,24 +1,20 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native';
-import HomeScreen from './src/screens/HomeScreen';
-import LoginScreen from './src/screens/LoginScreen';
-import SignUpScreen from './src/screens/SignUpScreen';
-import { AuthProvider } from './src/providers/AuthProvider';
+import 'react-native-gesture-handler';
 
-const Stack = createStackNavigator();
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { AppNavigator } from './src/navigation/AppNavigator';
+import { AuthProvider } from './src/providers/AuthProvider';
+import { AppProvider } from './src/providers/AppProvider';
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} />
-          <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}} />
-          <Stack.Screen name="Signup" component={SignUpScreen} options={{headerShown: false}} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </AuthProvider>
+    <NavigationContainer>
+      <AuthProvider>
+        <AppProvider>
+          <AppNavigator />
+        </AppProvider>
+      </AuthProvider>
+    </NavigationContainer>
   );
 };
 
