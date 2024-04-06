@@ -4,10 +4,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import GradientButton from '../components/GradientButton';
 import AuthService from '../services/AuthService';
 import { useAuth } from '../providers/AuthProvider';
-import { StackScreenProps } from '@react-navigation/stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
-type LoginScreenParams = StackScreenProps<RootStackParamList, 'Login'>;
+type LoginScreenParams = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const LoginScreen: React.FC<LoginScreenParams> = () => {
   const [email, setEmail] = useState('');

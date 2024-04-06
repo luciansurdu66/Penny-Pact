@@ -2,10 +2,13 @@ package org.example.controller;
 
 import org.example.dto.DebtDto;
 import org.example.dto.PaymentDto;
-import org.example.model.Debt;
 import org.example.mapper.Mapper;
 import org.example.model.User;
+import org.example.request.CreateGroupRequest;
+import org.example.response.Response;
 import org.example.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -17,29 +20,31 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserSessionController {
 
-    private final TokenService tokenService;
-    private final UserService userService;
-    private final GroupService groupService;
-    private final PaymentService paymentService;
-    private final DebtService debtService;
     private final UserGroupService userGroupService;
+    private final PaymentService paymentService;
+    private final TokenService tokenService;
+    private final GroupService groupService;
+    private final UserService userService;
+    private final DebtService debtService;
     private final Mapper mapper;
+    private final Logger logger;
 
     public UserSessionController(
+        UserGroupService userGroupService,
+        PaymentService paymentService,
+        GroupService groupService,
         TokenService tokenService,
         UserService userService,
-        GroupService groupService,
-        PaymentService paymentService,
         DebtService debtService,
-        UserGroupService userGroupService,
         Mapper mapper
     ) {
-        this.tokenService = tokenService;
-        this.userService = userService;
-        this.groupService = groupService;
-        this.paymentService = paymentService;
-        this.debtService = debtService;
+        this.logger = LoggerFactory.getLogger(UserSessionController.class);
         this.userGroupService = userGroupService;
+        this.paymentService = paymentService;
+        this.tokenService = tokenService;
+        this.groupService = groupService;
+        this.userService = userService;
+        this.debtService = debtService;
         this.mapper = mapper;
     }
 
@@ -53,6 +58,8 @@ public class UserSessionController {
             String userEmail = tokenService.getTokenSubject(token);
             User user = userService.getByEmail(userEmail);
             List<Integer> userGroupIds = userGroupService.getGroupIdsByUserId(user.getId());
+
+            logger.info("Get all groups for user {}", user.getId());
 
             response = ResponseEntity.ok(groupService.getGroupsByIds(userGroupIds));
         } catch (JwtException ignored) {
@@ -73,6 +80,8 @@ public class UserSessionController {
         try {
             String userEmail = tokenService.getTokenSubject(token);
             User user = userService.getByEmail(userEmail);
+
+            logger.info("User {} requested group {} payments", user.getId(), groupId);
 
             // Checking if the user is authorized.
 
@@ -139,6 +148,40 @@ public class UserSessionController {
                 .toList();
 
             response = ResponseEntity.ok(groupDebts);
+        } catch (JwtException ignored) {
+            response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .build();
+        }
+
+        return response;
+    }
+
+    @PostMapping("group/new")
+    public ResponseEntity<?> addNewGroup(
+        @RequestHeader("Authorization") String token,
+        @RequestBody CreateGroupRequest request
+    ) {
+        ResponseEntity<?> response;
+        String groupName = request.getGroupName();
+
+        if (groupName == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new Object() {
+                    public String error = "groupName field was not provided";
+                });
+        }
+
+        try {
+            String userEmail = tokenService.getTokenSubject(token);
+            User user = userService.getByEmail(userEmail);
+            int _newGroupId = groupService.createGroup(groupName);
+
+            logger.info("User {} requested a new group with the name '{}'", user.getId(), groupName);
+
+            userGroupService.addUserGroupPair(user.getId(), _newGroupId);
+            response = ResponseEntity.ok(new Object() {
+                public int newGroupId = _newGroupId;
+            });
         } catch (JwtException ignored) {
             response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .build();

@@ -9,9 +9,11 @@ interface AppState {
   groupDebts: (Debt)[];
   isFetchingGroups: boolean;
   isFecthingGroupDetails: boolean;
+  isSavingGroup: boolean;
 
   fetchGroups: () => void;
   fetchGroupDetails: (groupId: number) => void;
+  saveGroup: (groupName: string, onSuccess: () => void) => void;
 }
 
 interface Action {
@@ -38,6 +40,11 @@ const AppReducer = (state: AppState, { type, payload }: Action ): AppState => {
       };
     case ActionType.FETCH_GROUP_DETAILS_FAILED:
       return { ...state, isFecthingGroupDetails: false };
+    case ActionType.SAVING_GROUP_STARTED:
+      return { ...state, isSavingGroup: true }
+    case ActionType.SAVING_GROUP_SUCCEDED:
+    case ActionType.SAVING_GROUP_FAILED:
+      return { ...state, isSavingGroup: false }
     default:
       return state;
   }

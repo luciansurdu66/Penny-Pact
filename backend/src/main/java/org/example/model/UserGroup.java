@@ -1,10 +1,27 @@
 package org.example.model;
 
+import java.util.Objects;
+
 public class UserGroup {
 
     private int id,
         userId,
         groupId;
+
+    // Overrides
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserGroup userGroup = (UserGroup) o;
+        return userId == userGroup.userId && groupId == userGroup.groupId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, groupId);
+    }
 
     public UserGroup(int id, int userId, int groupId) {
         this.id = id;

@@ -1,5 +1,5 @@
-import { FC, useEffect, useState } from "react";
-import { FlatList, ActivityIndicator, ListRenderItem, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FC, useCallback, useEffect, useState } from "react";
+import { FlatList, ActivityIndicator, ListRenderItem, StyleSheet, Text, TouchableOpacity, View, TextInput } from "react-native";
 import GroupItem from "../components/GroupItem";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Banner from "../components/Banner";
@@ -8,23 +8,31 @@ import Group from "../models/Group";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import SearchBar from "../components/SearchBar";
 import { DrawerScreenProps } from "@react-navigation/drawer";
+import { Button, Dialog } from "react-native-paper";
+import { UserSessionService } from "../services/UserSessionService";
+import { useAuth } from "../providers/AuthProvider";
 
 type GroupListScreenProps = DrawerScreenProps<RootStackParamList, 'GroupList'>;
 
 const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
-  const { 
-    groups, 
-    isFetchingGroups, 
-    fetchGroups,
-  } = useApp();
-
   const renderItem: ListRenderItem<Group> = ({ item }) => {
     return (<GroupItem name={item.name} onPress={ () => handleGroupItemPress(item.id) } />);
   };
 
   // States
 
+  const { 
+    groups, 
+    isFetchingGroups,
+    isSavingGroup, 
+    fetchGroups,
+    saveGroup
+  } = useApp();
+
   const [searchValue, setSearchValue] = useState('');
+  const [groupCreationDialogInputValue, setGroupCreationDialogInputValue] = useState('');
+  const [groupCreationDialogError, setGroupCreationDialogError] = useState('');
+  const [isGroupCreationDialogVisible, setIsGroupCreationDialogVisible] = useState(false);
 
   // Effects
 
@@ -82,10 +90,83 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
             )}
           </View>
         )}
-        <TouchableOpacity style={styles.fab}>
-          <Icon name='plus-circle' size={64} color={'#f8d717'} />
-        </TouchableOpacity>
+        {!isGroupCreationDialogVisible && (
+          <TouchableOpacity 
+            style={styles.fab}
+            onPress={() => setIsGroupCreationDialogVisible(true)}
+          >
+            <Icon name='plus-circle' size={64} color={'#f8d717'} />
+          </TouchableOpacity>
+        )}
       </View>
+      <Dialog 
+        visible={isGroupCreationDialogVisible}
+        onDismiss={
+          () => {
+            setIsGroupCreationDialogVisible(false)
+            setGroupCreationDialogInputValue('');
+            setGroupCreationDialogError('');
+          }
+        }
+        style={{ backgroundColor: '#f8d717' }}
+        theme={{ colors: { primary: '#f8d717' } }}
+      >
+        <Dialog.Title>
+          New Group
+        </Dialog.Title>
+        <Dialog.Content>
+          <View style={styles.inputContainer}>
+            <TextInput
+              editable={!isSavingGroup}
+              selectTextOnFocus={!isSavingGroup}
+              style={styles.input}
+              placeholder="Name"
+              placeholderTextColor="black"
+              value={groupCreationDialogInputValue}
+              onChangeText={
+                newValue => { 
+                  if (newValue.length <= 36 ) {
+                    setGroupCreationDialogInputValue(newValue);
+                  }
+              }}
+            />
+          </View>
+          {groupCreationDialogError != '' && (
+            <Text style={{ color: 'red' }}>{groupCreationDialogError}</Text>
+          )}
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button 
+            disabled={isSavingGroup}
+            onPress={
+              () => {
+                setIsGroupCreationDialogVisible(false)
+                setGroupCreationDialogInputValue('');
+                setGroupCreationDialogError('');
+            }}
+            textColor="black"
+          >
+            <Text>Cancel</Text>
+          </Button>
+          <Button
+            disabled={isSavingGroup}
+            onPress={() => {
+              if (groupCreationDialogInputValue.trim() != '') {
+                onSaveGroup();
+              } else {
+                setGroupCreationDialogError('Name must not be empty!');
+              }
+            }}
+            loading={isSavingGroup}
+            contentStyle={{ flexDirection: 'row-reverse' }}
+            textColor='black'
+          >
+            <Text>
+              {!isSavingGroup ? 'Create' : 'Creating'}
+            </Text>
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
     </View>
   );
 
@@ -98,6 +179,19 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
   function handleGroupItemPress(groupId: number) {
     navigation.navigate('Group', { groupId });
   };
+
+  function onSaveGroup() {
+    const newGroupName = groupCreationDialogInputValue;
+
+    console.log(newGroupName);
+
+    saveGroup(newGroupName, () => {
+      setIsGroupCreationDialogVisible(false);
+      setGroupCreationDialogError('');
+      setGroupCreationDialogInputValue('');
+      fetchGroups();
+    });
+  }
 }
 
 const styles = StyleSheet.create({
@@ -155,6 +249,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16
   },
+  inputContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderColor: 'black',
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)', // semi-transparent white
+  },
+  input: {
+    flex: 1,
+    height: 50,
+    color: 'black',
+    fontFamily: 'Avenir',
+    padding: 0,
+  }
 });
 
 export default GroupListScreen;

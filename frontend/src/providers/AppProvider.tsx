@@ -4,6 +4,8 @@ import { ActionType } from "../utils/ActionType";
 import { UserSessionService } from "../services/UserSessionService";
 import { useAuth } from "./AuthProvider";
 import DateFormater from "../utils/DateFormater";
+import Group from "../models/Group";
+import { recognizePrefixSuffix } from "react-native-reanimated/lib/typescript/reanimated2/animation/util";
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
@@ -11,10 +13,12 @@ const initialAppState: AppState = {
   groups: [],
   groupPayments: [],
   groupDebts: [],
+  isSavingGroup: false,
   isFetchingGroups: false, 
   isFecthingGroupDetails: false,
   fetchGroups: () => {},
   fetchGroupDetails: (groupId) => {},
+  saveGroup: (groupName: string, onSuccess: () => void) => {},
 };
 
 const AppProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -26,8 +30,9 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const fetchGroups = useCallback(fetchGroupsCallback, [token]);
   const fetchGroupDetails = useCallback(fetchGroupDetailsCallback, [token]);
+  const saveGroup = useCallback(saveGroupCallback, [token]);
 
-  const providerValue = { ...state, fetchGroups, fetchGroupDetails };
+  const providerValue = { ...state, fetchGroups, fetchGroupDetails, saveGroup };
 
   return (
     <AppContext.Provider value={providerValue}>
@@ -43,14 +48,23 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
     
     UserSessionService.fetchAllGroups(token)
       .then(response => {
-        const groups = response.data;
+        const receivedGroups = response.data;
+        const finalGroups: Group[] = []
+
+        receivedGroups.forEach((group: Group) => {
+          if (receivedGroups.filter((_group: Group) => _group.name == group.name).length > 1) {
+            finalGroups.push({ id: group.id, name: `${group.name} #${group.id}`});
+          } else {
+            finalGroups.push(group);
+          }
+        });
 
         dispatch({ 
           type: ActionType.FETCH_GROUPS_SUCCEDED,
-          payload: { groups }
+          payload: { groups: finalGroups }
         });
         
-        console.info('Fetch Groups Response', groups);
+        console.info('Fetch Groups Response', finalGroups);
       })
       .catch(() => {
         setToken(null);
@@ -88,6 +102,25 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
       setToken(null);
       console.info(`Fetch Group ${groupId} Payments/Debts Response`, { status: 'Failed', message: 'Logging out...' });
     }
+  }
+
+  async function saveGroupCallback(groupName: String, onSuccess: () => void) {
+    dispatch({ type: ActionType.SAVING_GROUP_STARTED })
+
+    // Delaying the result one second.
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    UserSessionService.createGroup(token, groupName)
+      .then(() => { 
+        dispatch({ type: ActionType.SAVING_GROUP_SUCCEDED });
+        onSuccess()
+      })
+      .catch(error => {
+        console.log(error);
+
+        dispatch({ type: ActionType.SAVING_GROUP_FAILED });
+        setToken(null);
+      });
   }
 };
 

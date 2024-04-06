@@ -4,10 +4,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import GradientButton from '../components/GradientButton';
 import { useAuth } from '../providers/AuthProvider';
 import AuthService from '../services/AuthService';
-import { StackScreenProps } from '@react-navigation/stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
-type SignUpScreenParams = StackScreenProps<RootStackParamList, 'SignUp'>;
+type SignUpScreenParams = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
 const SignUpScreen: React.FC<SignUpScreenParams> = () => {
   const [username, setUsername] = useState('');

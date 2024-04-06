@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import GradientButton from '../components/GradientButton';
-import { StackScreenProps } from '@react-navigation/stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
-type HomeScreenProps = StackScreenProps<RootStackParamList, 'Home'>;
+type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (

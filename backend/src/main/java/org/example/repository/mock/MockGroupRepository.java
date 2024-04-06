@@ -44,6 +44,15 @@ public class MockGroupRepository implements GroupRepository {
     }
 
     @Override
+    public Group findByName(String name) {
+        return groups.values()
+                .stream()
+                .filter(group -> group.getName().equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public List<Group> findGroupsByIds(List<Integer> groupIds) {
         return groupIds.stream()
             .map(groupId -> groups.get(groupId))

@@ -2,14 +2,24 @@ import axios from "axios";
 import AppConfig from "../configurations/AppConfig";
 
 class UserSessionService {
+  static async createGroup(token, groupName) {
+    const groupCreationUrl = AppConfig.baseUrl + "/user/group/new";
+    const headers = { Authorization: token };
+    const config = { headers, timeout: 1000 };
+
+    console.log(`Create Group '${groupName}' Request`);
+
+    return axios.post(groupCreationUrl, { groupName }, config);
+  }
+  
   static async fetchAllGroups(token) {
     const groupsUrl = AppConfig.baseUrl + "/user/groups";
     const headers = { Authorization: token };
-    const fetchGroupsRequest = { headers, timeout: 1000 }; 
+    const config = { headers, timeout: 1000 }; 
 
     console.info('Fetch Groups Request');
 
-    return axios.get(groupsUrl, fetchGroupsRequest);
+    return axios.get(groupsUrl, config);
   }
 
   static async fetchPaymentsByGroupId(token, groupId) {
@@ -25,11 +35,11 @@ class UserSessionService {
   static async fetchDebtsByGroupId(token, groupId) {
     const groupDebtsUrl = AppConfig.baseUrl + `/user/group/${groupId}/debts`;
     const headers = { Authorization: token };
-    const fetchGroupDebtsRequest = { headers, timeout: 1000 };
+    const config = { headers, timeout: 1000 };
 
     console.info(`Fetch Group ${groupId} Debts Request`);
 
-    return axios.get(groupDebtsUrl, fetchGroupDebtsRequest);
+    return axios.get(groupDebtsUrl, config);
   }
 }
 

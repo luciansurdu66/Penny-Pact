@@ -13,7 +13,12 @@ const GroupItem: FC<GroupItemProps> = ({ name, onPress }) => {
     <TouchableNativeFeedback onPress={onPress}>
       <View style={styles.wrapper}>
         <Image source={require(defaultGroupImage)} style={styles.image} />
-        <Text style={styles.name}>{name}</Text>
+        <Text 
+          style={styles.name}
+          numberOfLines={1}
+        >
+          {name}
+        </Text>
       </View>
     </TouchableNativeFeedback>
   );
@@ -33,7 +38,8 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 24,
-    color: 'white'
+    color: 'white',
+    flex: 1
   }
 });
 

@@ -18,6 +18,15 @@ public class GroupService {
         groupRepository = _groupRepository;
     }
 
+    public int createGroup(String groupName) {
+        int groupId = groupRepository.size() + 1;
+        Group newGroup = new Group(groupId, groupName);
+
+        groupRepository.save(newGroup);
+
+        return groupId;
+    }
+
     public List<Group> getGroupsByIds(List<Integer> groupIds) {
         return groupRepository.findGroupsByIds(groupIds);
     }
