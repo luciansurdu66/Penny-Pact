@@ -1,9 +1,11 @@
 package org.example.mapper;
 
 import org.example.dto.DebtDto;
+import org.example.dto.GroupDto;
 import org.example.dto.PaymentDto;
 import org.example.dto.UserDto;
 import org.example.model.Debt;
+import org.example.model.Group;
 import org.example.model.Payment;
 import org.example.model.User;
 import org.example.service.UserService;
@@ -56,6 +58,18 @@ public class Mapper {
             userService.getById(debt.getDebtorId()).getUsername(),
             userService.getById(debt.getCreditorId()).getUsername(),
             debt.getAmount()
+        );
+    }
+
+    public GroupDto toGroupDto(Group group) {
+        int creatorId = group.getCreatorId();
+        String creator = userService.getById(creatorId)
+            .getUsername();
+
+        return new GroupDto(
+            group.getId(),
+            creator,
+            group.getName()
         );
     }
 }

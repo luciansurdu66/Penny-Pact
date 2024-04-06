@@ -19,9 +19,10 @@ public class MockGroupRepository implements GroupRepository {
 
     public MockGroupRepository() {
         groups = new HashMap<>(Map.of(
-                1, new Group(1, "Apartament 48"),
-                2, new Group(2, "Trip Bucuresti"),
-                3, new Group(3, "Me & Adi")
+            1, new Group(1, 3, "Apartament 48"),
+            2, new Group(2, 3, "Trip Bucuresti"),
+            3, new Group(3, 3, "Me & Adi"),
+            4, new Group(4, 4, "Penny Pact")
         ));
     }
 

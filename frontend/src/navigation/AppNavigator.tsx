@@ -8,11 +8,11 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import GroupListScreen from "../screens/GroupListScreen";
 import GroupScreen from "../screens/GroupScreen";
 import SettingsScreen from "../screens/SettingsScreen";
-import CustomDrawerContent from "../components/DrawerContent";
+import CustomDrawerContent from "../components/CustomDrawerContent";
 import FindFriendsScreen from "../screens/FindFriendsScreen";
 
 type RootStackParamList = {
-  Home: undefined;
+  Home: undefined; 
   Login: undefined;
   SignUp: undefined;
   Groups: undefined;
@@ -26,8 +26,8 @@ type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator<RootStackParamList>();
 
-const AppNavigator: FC = () => {
-  const { token } = useAuth();
+const AppNavigator: FC = () => {    
+  const { token  } = useAuth();
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

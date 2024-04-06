@@ -19,4 +19,11 @@ public interface UserGroupRepository extends Repository<UserGroup, Integer> {
      * @return True if exists, false otherwise.
      */
     boolean containsUserGroupKeyPair(int userId, int groupId);
+
+    /**
+     * Removes all user-group pairs that contain
+     * the given group id.
+     * @param groupId The id of the group.
+     */
+    void removeAllPairsHavingGroupId(int groupId);
 }

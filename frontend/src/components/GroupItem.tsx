@@ -2,23 +2,37 @@ import { FC } from "react";
 import { Image, StyleSheet, Text, TouchableNativeFeedback, View } from "react-native";
 
 interface GroupItemProps {
+  id: number,
+  creator: string,
   name: string;
   onPress: () => void;
+  onLongPress: () => void;
 }
 
-const GroupItem: FC<GroupItemProps> = ({ name, onPress }) => {
+const GroupItem: FC<GroupItemProps> = ({ name, creator, onPress, onLongPress }) => {
   const defaultGroupImage = '../../assets/images/landscape.jpg';
 
   return (
-    <TouchableNativeFeedback onPress={onPress}>
+    <TouchableNativeFeedback 
+      onPress={onPress}
+      onLongPress={onLongPress}
+    >
       <View style={styles.wrapper}>
         <Image source={require(defaultGroupImage)} style={styles.image} />
-        <Text 
-          style={styles.name}
-          numberOfLines={1}
-        >
-          {name}
-        </Text>
+        <View style={styles.details}>
+          <Text 
+            style={styles.name}
+            numberOfLines={1}
+          >
+            {name}
+          </Text>
+          <Text
+            style={styles.creator}
+            numberOfLines={1}
+          >
+            Created by {creator}
+          </Text>
+        </View>
       </View>
     </TouchableNativeFeedback>
   );
@@ -39,7 +53,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     color: 'white',
-    flex: 1
+  },
+  creator: {
+  },
+  details: {
+    flex: 1,
   }
 });
 

@@ -9,14 +9,22 @@ import { RootStackParamList } from "../navigation/AppNavigator";
 import SearchBar from "../components/SearchBar";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import { Button, Dialog } from "react-native-paper";
-import { UserSessionService } from "../services/UserSessionService";
-import { useAuth } from "../providers/AuthProvider";
 
 type GroupListScreenProps = DrawerScreenProps<RootStackParamList, 'GroupList'>;
 
 const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
   const renderItem: ListRenderItem<Group> = ({ item }) => {
-    return (<GroupItem name={item.name} onPress={ () => handleGroupItemPress(item.id) } />);
+    return (
+      <GroupItem 
+        id={item.id}
+        name={item.name}
+        creator={item.creator}
+        onPress={ () => handleGroupItemPress(item.id) } 
+        onLongPress={ () => {
+          setGroupMarkedForDeletion(item);
+          setIsGroupDeletionDialogVisible(true);
+        }}
+      />);
   };
 
   // States
@@ -24,15 +32,20 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
   const { 
     groups, 
     isFetchingGroups,
-    isSavingGroup, 
+    isSavingGroup,
+    isDeletingGroup, 
     fetchGroups,
-    saveGroup
+    saveGroup,
+    deleteGroup
   } = useApp();
 
   const [searchValue, setSearchValue] = useState('');
   const [groupCreationDialogInputValue, setGroupCreationDialogInputValue] = useState('');
   const [groupCreationDialogError, setGroupCreationDialogError] = useState('');
   const [isGroupCreationDialogVisible, setIsGroupCreationDialogVisible] = useState(false);
+  const [isGroupDeletionDialogVisible, setIsGroupDeletionDialogVisible] = useState(false);
+  const [groupMarkedForDeletion, setGroupMarkedForDeletion] = useState<Group | undefined>();
+  const [groupDeletionDialogError, setGroupDeletionDialogError] = useState('');
 
   // Effects
 
@@ -103,13 +116,14 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
         visible={isGroupCreationDialogVisible}
         onDismiss={
           () => {
-            setIsGroupCreationDialogVisible(false)
-            setGroupCreationDialogInputValue('');
-            setGroupCreationDialogError('');
+            if (!isSavingGroup) {
+              setIsGroupCreationDialogVisible(false)
+              setGroupCreationDialogInputValue('');
+              setGroupCreationDialogError('');
+            }
           }
         }
         style={{ backgroundColor: '#f8d717' }}
-        theme={{ colors: { primary: '#f8d717' } }}
       >
         <Dialog.Title>
           New Group
@@ -159,12 +173,82 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
             }}
             loading={isSavingGroup}
             contentStyle={{ flexDirection: 'row-reverse' }}
-            textColor='black'
+            textColor="black"
           >
             <Text>
               {!isSavingGroup ? 'Create' : 'Creating'}
             </Text>
           </Button>
+        </Dialog.Actions>
+      </Dialog>
+      <Dialog 
+        visible={isGroupDeletionDialogVisible}
+        onDismiss={
+          () => {
+            if (!isDeletingGroup) {
+              setIsGroupDeletionDialogVisible(false)
+            }
+          }
+        }
+        style={{ backgroundColor: '#f8d717' }}
+      >
+        <Dialog.Title>
+          <Text>
+            Delete Group {isGroupDeletionDialogVisible && `'${groupMarkedForDeletion!!.name}'`}?
+          </Text>
+        </Dialog.Title>
+        <Dialog.Content
+          style={{
+            gap: 8,
+            alignItems: 'center'
+          }}
+        >
+          <Text style={{
+            color: 'black',
+            textAlign: 'center',
+            paddingHorizontal: 32
+          }}>
+            Are you sure you want to delete this group? (This can be done only by the group creator.)
+          </Text>
+          {groupDeletionDialogError != '' && (
+            <Text style={{ ...styles.error, textAlign: 'center' }}>
+              {groupDeletionDialogError}
+            </Text>
+          )}
+        </Dialog.Content>
+        <Dialog.Actions>
+          {groupDeletionDialogError == '' ? (
+            <>
+              <Button
+                disabled={isDeletingGroup}
+                onPress={() => setIsGroupDeletionDialogVisible(false)}
+                textColor="black"
+              >
+                <Text>No</Text>
+              </Button>
+              <Button
+                disabled={isDeletingGroup}
+                onPress={onDeleteGroup}
+                textColor="black"
+                contentStyle={{ flexDirection: 'row-reverse' }}
+                loading={isDeletingGroup}
+              >
+                <Text>{isDeletingGroup ? 'Deleting' : 'Yes'}</Text>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                onPress={() => {
+                  setIsGroupDeletionDialogVisible(false);
+                  setGroupDeletionDialogError('');
+                }}
+                textColor="black"
+              >
+                <Text>Dimiss</Text>
+              </Button>
+            </>
+          )}
         </Dialog.Actions>
       </Dialog>
     </View>
@@ -183,14 +267,27 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
   function onSaveGroup() {
     const newGroupName = groupCreationDialogInputValue;
 
-    console.log(newGroupName);
-
     saveGroup(newGroupName, () => {
       setIsGroupCreationDialogVisible(false);
       setGroupCreationDialogError('');
       setGroupCreationDialogInputValue('');
       fetchGroups();
     });
+  }
+
+  function onDeleteGroup() {
+    const groupId = groupMarkedForDeletion!!.id;
+
+    deleteGroup(
+      groupId, 
+      () => {   // onSuccess
+        setIsGroupDeletionDialogVisible(false);
+        fetchGroups();
+      }, 
+      () => {   // onFailure
+        setGroupDeletionDialogError('You are not the creator of this group.');
+      }
+    )
   }
 }
 
@@ -212,7 +309,8 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 32
+    opacity: 1,
+    bottom: 32,
   },
   error: {
     fontSize: 16,

@@ -3,9 +3,9 @@ package org.example.controller;
 import org.example.dto.DebtDto;
 import org.example.dto.PaymentDto;
 import org.example.mapper.Mapper;
+import org.example.model.Group;
 import org.example.model.User;
 import org.example.request.CreateGroupRequest;
-import org.example.response.Response;
 import org.example.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,10 @@ public class UserSessionController {
 
             logger.info("Get all groups for user {}", user.getId());
 
-            response = ResponseEntity.ok(groupService.getGroupsByIds(userGroupIds));
+            response = ResponseEntity.ok(
+                groupService.getGroupsByIds(userGroupIds)
+                    .stream().map(mapper::toGroupDto)
+            );
         } catch (JwtException ignored) {
             response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .build();
@@ -164,17 +167,17 @@ public class UserSessionController {
         ResponseEntity<?> response;
         String groupName = request.getGroupName();
 
-        if (groupName == null) {
+        if (groupName == null || groupName.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new Object() {
-                    public String error = "groupName field was not provided";
+                    public String error = "groupName field was not provided or it was empty";
                 });
         }
 
         try {
             String userEmail = tokenService.getTokenSubject(token);
             User user = userService.getByEmail(userEmail);
-            int _newGroupId = groupService.createGroup(groupName);
+            int _newGroupId = groupService.createGroup(groupName, user.getId());
 
             logger.info("User {} requested a new group with the name '{}'", user.getId(), groupName);
 
@@ -182,6 +185,41 @@ public class UserSessionController {
             response = ResponseEntity.ok(new Object() {
                 public int newGroupId = _newGroupId;
             });
+        } catch (JwtException ignored) {
+            response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .build();
+        }
+
+        return response;
+    }
+
+    @DeleteMapping("/group/{groupId}/delete")
+    public ResponseEntity<?> deleteGroup(
+        @RequestHeader("Authorization") String token,
+        @PathVariable int groupId
+    ) {
+        ResponseEntity<?> response;
+
+        try {
+            String userEmail = tokenService.getTokenSubject(token);
+            User user = userService.getByEmail(userEmail);
+            Group groupToBeDeleted = groupService.getGroupById(groupId);
+
+            logger.info("User {} requested the deletion of group {}", user.getId(), groupId);
+
+            // The group does not exist or the user requesting the
+            // deletion did not create the group.
+            if (groupToBeDeleted == null ||
+                groupToBeDeleted.getCreatorId() != user.getId()) {
+
+                throw new JwtException("");
+            }
+
+            groupService.deleteGroupById(groupId);
+            userGroupService.removeUserGroupPairsHavingGroupId(groupId);
+
+            response = ResponseEntity.ok()
+                .build();
         } catch (JwtException ignored) {
             response = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .build();

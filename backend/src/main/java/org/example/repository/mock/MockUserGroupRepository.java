@@ -16,7 +16,7 @@ import java.util.Optional;
 @Qualifier("mockUserGroupRepository")
 public class MockUserGroupRepository implements UserGroupRepository {
 
-    private final Map<Integer, UserGroup> userGroupMap;
+    private Map<Integer, UserGroup> userGroupMap;
 
     public MockUserGroupRepository() {
         this.userGroupMap = new HashMap<>(Map.of(
@@ -24,7 +24,9 @@ public class MockUserGroupRepository implements UserGroupRepository {
             2, new UserGroup(2, 2, 1),
             3, new UserGroup(3, 3, 1),
             4, new UserGroup(4, 3, 2),
-            5, new UserGroup(5, 3, 3)
+            5, new UserGroup(5, 3, 3),
+            6, new UserGroup(6, 3, 4),
+            7, new UserGroup(7, 4, 4)
         ));
     }
 
@@ -48,12 +50,28 @@ public class MockUserGroupRepository implements UserGroupRepository {
 
     @Override
     public Iterable<UserGroup> findAll() {
-        throw new NotImplementedException();
+        return userGroupMap.values();
     }
 
     @Override
     public void update(UserGroup modifiedEntity) throws EntityNotFoundException {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public void removeAllPairsHavingGroupId(int groupId) {
+        Map<Integer, UserGroup> updatedUserGroupMap = new HashMap<>();
+
+        for (var entry : userGroupMap.entrySet()) {
+            int key = entry.getKey();
+            UserGroup value = entry.getValue();
+
+            if (value.getGroupId() != groupId) {
+                updatedUserGroupMap.put(key, value);
+            }
+        }
+
+        userGroupMap = updatedUserGroupMap;
     }
 
     @Override

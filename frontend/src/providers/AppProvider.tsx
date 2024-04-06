@@ -5,7 +5,6 @@ import { UserSessionService } from "../services/UserSessionService";
 import { useAuth } from "./AuthProvider";
 import DateFormater from "../utils/DateFormater";
 import Group from "../models/Group";
-import { recognizePrefixSuffix } from "react-native-reanimated/lib/typescript/reanimated2/animation/util";
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
@@ -14,16 +13,20 @@ const initialAppState: AppState = {
   groupPayments: [],
   groupDebts: [],
   isSavingGroup: false,
+  isDeletingGroup: false,
   isFetchingGroups: false, 
   isFecthingGroupDetails: false,
   fetchGroups: () => {},
   fetchGroupDetails: (groupId) => {},
   saveGroup: (groupName: string, onSuccess: () => void) => {},
+  deleteGroup: (groupId: number, onSuccess: () => void, onFailure: () => void) => {}
 };
 
 const AppProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { token, setToken } = useAuth();
+  
+  // States
 
+  const { token, setToken } = useAuth();
   const [state, dispatch] = useReducer(AppReducer, initialAppState);
   
   // Callbacks
@@ -31,8 +34,9 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
   const fetchGroups = useCallback(fetchGroupsCallback, [token]);
   const fetchGroupDetails = useCallback(fetchGroupDetailsCallback, [token]);
   const saveGroup = useCallback(saveGroupCallback, [token]);
+  const deleteGroup = useCallback(deleteGroupCallback, [token]);
 
-  const providerValue = { ...state, fetchGroups, fetchGroupDetails, saveGroup };
+  const providerValue = { ...state, fetchGroups, fetchGroupDetails, saveGroup, deleteGroup };
 
   return (
     <AppContext.Provider value={providerValue}>
@@ -43,8 +47,8 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
   async function fetchGroupsCallback() {
     dispatch({ type: ActionType.FETCH_GROUPS_STARTED });
 
-    // Delaying the result 1 second.
-    await new Promise(resolve => setTimeout(resolve, 1000)); 
+    // Delaying the result half a second.
+    await new Promise(resolve => setTimeout(resolve, 500)); 
     
     UserSessionService.fetchAllGroups(token)
       .then(response => {
@@ -53,7 +57,7 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
 
         receivedGroups.forEach((group: Group) => {
           if (receivedGroups.filter((_group: Group) => _group.name == group.name).length > 1) {
-            finalGroups.push({ id: group.id, name: `${group.name} #${group.id}`});
+            finalGroups.push({ id: group.id, name: `${group.name} #${group.id}`, creator: group.creator });
           } else {
             finalGroups.push(group);
           }
@@ -105,7 +109,7 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
   }
 
   async function saveGroupCallback(groupName: String, onSuccess: () => void) {
-    dispatch({ type: ActionType.SAVING_GROUP_STARTED })
+    dispatch({ type: ActionType.SAVING_GROUP_STARTED });
 
     // Delaying the result one second.
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -113,13 +117,38 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
     UserSessionService.createGroup(token, groupName)
       .then(() => { 
         dispatch({ type: ActionType.SAVING_GROUP_SUCCEDED });
-        onSuccess()
+        onSuccess();
       })
       .catch(error => {
         console.log(error);
 
         dispatch({ type: ActionType.SAVING_GROUP_FAILED });
         setToken(null);
+      });
+  }
+
+  async function deleteGroupCallback(groupId: number, onSuccess: () => void, onFailure: () => void) {
+    dispatch({ type: ActionType.DELETING_GROUP_STARTED });
+
+    // Delaying the result one second.
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    UserSessionService.deleteGroup(token, groupId)
+      .then(() => {
+        dispatch({ type: ActionType.DELETING_GROUP_SUCCEDED });
+        onSuccess();
+      })
+      .catch((error) => {
+        if (error.response) {
+          dispatch({ type: ActionType.DELETING_GROUP_FAILED });
+          if (error.response.status == 401) {
+            onFailure();
+          } else {
+            setToken(null);
+          }
+        } else {
+          setToken(null);
+        }
       });
   }
 };

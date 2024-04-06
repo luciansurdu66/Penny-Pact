@@ -11,6 +11,16 @@ class UserSessionService {
 
     return axios.post(groupCreationUrl, { groupName }, config);
   }
+
+  static async deleteGroup(token, groupId) {
+    const groupDeletionUrl = AppConfig.baseUrl + `/user/group/${groupId}/delete`;
+    const headers = { Authorization: token };
+    const config = { headers, timeout: 1000 };
+
+    console.log(`Delete Group ${groupId} Request`);
+
+    return axios.delete(groupDeletionUrl, config);
+  }
   
   static async fetchAllGroups(token) {
     const groupsUrl = AppConfig.baseUrl + "/user/groups";

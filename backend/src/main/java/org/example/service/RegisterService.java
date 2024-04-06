@@ -54,7 +54,6 @@ public class RegisterService {
      * will be handled by the database.
      * @return A unique user id.
      */
-    @Deprecated
     private int generateUniqueUserId() {
         int id = 0;
         for (User user : userRepository.findAll()) {

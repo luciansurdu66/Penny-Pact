@@ -10,10 +10,12 @@ interface AppState {
   isFetchingGroups: boolean;
   isFecthingGroupDetails: boolean;
   isSavingGroup: boolean;
+  isDeletingGroup: boolean;
 
   fetchGroups: () => void;
   fetchGroupDetails: (groupId: number) => void;
   saveGroup: (groupName: string, onSuccess: () => void) => void;
+  deleteGroup: (groupId: number, onSuccess: () => void, onFailure: () => void) => void;
 }
 
 interface Action {
@@ -44,7 +46,12 @@ const AppReducer = (state: AppState, { type, payload }: Action ): AppState => {
       return { ...state, isSavingGroup: true }
     case ActionType.SAVING_GROUP_SUCCEDED:
     case ActionType.SAVING_GROUP_FAILED:
-      return { ...state, isSavingGroup: false }
+      return { ...state, isSavingGroup: false };
+    case ActionType.DELETING_GROUP_STARTED:
+      return { ...state, isDeletingGroup: true };
+    case ActionType.DELETING_GROUP_SUCCEDED:
+    case ActionType.DELETING_GROUP_FAILED:
+      return { ...state, isDeletingGroup: false };
     default:
       return state;
   }

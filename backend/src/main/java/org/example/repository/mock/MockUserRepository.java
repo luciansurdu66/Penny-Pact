@@ -18,24 +18,32 @@ public class MockUserRepository implements UserRepository {
 
     public MockUserRepository() {
         users = new HashMap<>(Map.of(
-                1, new User(
-                        1,
-                        "Dan",
-                        "passwd1",
-                        "Dan",
-                        "Nehita",
-                        "dan.nechita@org.example.com"),
-                2, new User(
-                        2,
-                        "Havi",
-                        "havi@org.example.com",
-                        "passwd2"),
-                3, new User(
-                        3,
-                        "Gio",
-                        "gio@org.example.com",
-                        "passwd3"
-                )
+        1, new User(
+                1,
+                "Dan",
+                "passwd1",
+                "Dan",
+                "Nehita",
+                "dan.nechita@org.example.com"
+            ),
+        2, new User(
+                2,
+                "Havi",
+                "havi@org.example.com",
+                "passwd2"
+            ),
+        3, new User(
+                3,
+                "Gio",
+                "gio@org.example.com",
+                "passwd3"
+            ),
+        4, new User(
+                4,
+                "Dalia",
+                "dalia@org.example.com",
+                "passwd4"
+            )
         ));
     }
 
