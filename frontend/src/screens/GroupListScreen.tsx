@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { FlatList, ActivityIndicator, ListRenderItem, StyleSheet, Text, TouchableOpacity, View, TextInput } from "react-native";
 import GroupItem from "../components/GroupItem";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -19,7 +19,7 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
         id={item.id}
         name={item.name}
         creator={item.creator}
-        onPress={ () => handleGroupItemPress(item.id) } 
+        onPress={ () => handleGroupItemPress(item) } 
         onLongPress={ () => {
           setGroupMarkedForDeletion(item);
           setIsGroupDeletionDialogVisible(true);
@@ -260,8 +260,8 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
     navigation.openDrawer();
   }
 
-  function handleGroupItemPress(groupId: number) {
-    navigation.navigate('Group', { groupId });
+  function handleGroupItemPress(group: Group) {
+    navigation.navigate('Group', { group });
   };
 
   function onSaveGroup() {

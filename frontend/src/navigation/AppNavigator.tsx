@@ -10,6 +10,7 @@ import GroupScreen from "../screens/GroupScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import CustomDrawerContent from "../components/CustomDrawerContent";
 import FindFriendsScreen from "../screens/FindFriendsScreen";
+import Group from "../models/Group";
 
 type RootStackParamList = {
   Home: undefined; 
@@ -17,7 +18,7 @@ type RootStackParamList = {
   SignUp: undefined;
   Groups: undefined;
   GroupList: undefined;
-  Group: { groupId: number };
+  Group: { group: Group };
   Authed: undefined;
   Settings: undefined;
   FindFriends: undefined;

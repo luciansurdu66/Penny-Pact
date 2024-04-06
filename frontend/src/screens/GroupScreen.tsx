@@ -29,8 +29,9 @@ const GroupScreen: FC<GroupScreenProps> = ({ navigation, route }) => {
   
   const [showPayments, setShowPayments] = useState(true);
   
-  const groupId = route.params.groupId;
-  const groupName = groups[groupId - 1]?.name ?? 'Unknown';
+  const group = route.params.group;
+  const groupId = group.id;
+  const groupName = group.name;
   const menuItems = ['Payments', 'Debts'];
 
   const menuItemsCallbacks: (() => void)[] = [
