@@ -1,5 +1,14 @@
 import { FC, useEffect, useState } from "react";
-import { FlatList, ActivityIndicator, ListRenderItem, StyleSheet, Text, TouchableOpacity, View, TextInput } from "react-native";
+import { 
+  FlatList, 
+  ActivityIndicator, 
+  ListRenderItem, 
+  StyleSheet, 
+  Text, 
+  TouchableOpacity, 
+  View, 
+  TextInput 
+} from "react-native";
 import GroupItem from "../components/GroupItem";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Banner from "../components/Banner";
@@ -154,7 +163,7 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
             disabled={isSavingGroup}
             onPress={
               () => {
-                setIsGroupCreationDialogVisible(false)
+                setIsGroupCreationDialogVisible(false);
                 setGroupCreationDialogInputValue('');
                 setGroupCreationDialogError('');
             }}

@@ -1,39 +1,28 @@
 import { FC } from "react";
 import { Image, StyleSheet, Text, TouchableNativeFeedback, View } from "react-native";
+import Friend from "../models/Friend";
 
-interface GroupItemProps {
-  id: number,
-  creator: string,
-  name: string;
-  onPress: () => void;
-  onLongPress: () => void;
+interface FriendItemProps {
+  friend: Friend
 }
 
-const GroupItem: FC<GroupItemProps> = ({ name, creator, onPress, onLongPress }) => {
-  const defaultGroupImage = '../../assets/images/landscape.jpg';
+const FriendItem: FC<FriendItemProps> = ({ friend }) => {
+  const username = friend.username;
+  const profilePicture = friend.profilePicture;
 
   return (
-    <TouchableNativeFeedback 
-      onPress={onPress}
-      onLongPress={onLongPress}
-    >
+    <TouchableNativeFeedback>
       <View style={styles.wrapper}>
         <Image 
-          source={require(defaultGroupImage)} 
+          source={profilePicture ?? require('../../assets/images/person.jpg')} 
           style={styles.image} 
         />
         <View style={styles.details}>
           <Text 
-            style={styles.name}
+            style={styles.username}
             numberOfLines={1}
           >
-            {name}
-          </Text>
-          <Text
-            style={styles.creator}
-            numberOfLines={1}
-          >
-            Created by {creator}
+            {username}
           </Text>
         </View>
       </View>
@@ -53,15 +42,13 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 32,
   },
-  name: {
+  username: {
     fontSize: 24,
     color: 'white',
-  },
-  creator: {
   },
   details: {
     flex: 1,
   }
 });
 
-export default GroupItem;
+export default FriendItem;

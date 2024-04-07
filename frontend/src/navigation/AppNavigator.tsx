@@ -9,7 +9,7 @@ import GroupListScreen from "../screens/GroupListScreen";
 import GroupScreen from "../screens/GroupScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import CustomDrawerContent from "../components/CustomDrawerContent";
-import FindFriendsScreen from "../screens/FindFriendsScreen";
+import FriendsScreen from "../screens/FriendsScreen";
 import Group from "../models/Group";
 
 type RootStackParamList = {
@@ -21,7 +21,7 @@ type RootStackParamList = {
   Group: { group: Group };
   Authed: undefined;
   Settings: undefined;
-  FindFriends: undefined;
+  Friends: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -89,11 +89,8 @@ const Authed: FC = () => {
         component={Groups}
       />
       <Drawer.Screen
-        name='FindFriends'
-        component={FindFriendsScreen}
-        options={{
-          title: 'Find Friends'
-        }}
+        name='Friends'
+        component={FriendsScreen}
       />
       <Drawer.Screen 
         name='Settings'

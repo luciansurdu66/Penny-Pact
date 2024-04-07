@@ -12,6 +12,7 @@ const initialAppState: AppState = {
   groups: [],
   groupPayments: [],
   groupDebts: [],
+  friends: [],
   isSavingGroup: false,
   isDeletingGroup: false,
   isFetchingGroups: false, 
@@ -36,7 +37,19 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
   const saveGroup = useCallback(saveGroupCallback, [token]);
   const deleteGroup = useCallback(deleteGroupCallback, [token]);
 
-  const providerValue = { ...state, fetchGroups, fetchGroupDetails, saveGroup, deleteGroup };
+  const providerValue = { 
+    ...state, 
+    fetchGroups, 
+    fetchGroupDetails, 
+    saveGroup, 
+    deleteGroup,
+    friends: [
+      { username: 'Havi' },
+      { username: 'Vlad', profilePicture: require('../../assets/images/vlad.png') },
+      { username: 'Dan' },
+      { username: 'Dalia', profilePicture: require('../../assets/images/dalia.png') },
+    ]
+  };
 
   return (
     <AppContext.Provider value={providerValue}>

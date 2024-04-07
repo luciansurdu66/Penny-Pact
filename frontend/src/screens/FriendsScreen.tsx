@@ -1,13 +1,28 @@
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { FC } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, ListRenderItem, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import Banner from "../components/Banner";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import Friend from "../models/Friend";
+import { useApp } from "../providers/AppProvider";
+import FriendItem from "../components/FriendItem";
 
-type FindFriendsScreenProps = DrawerScreenProps<RootStackParamList, 'FindFriends'>;
+type FindFriendsScreenProps = DrawerScreenProps<RootStackParamList, 'Friends'>;
 
 const SettingsScreen: FC<FindFriendsScreenProps> = ({ navigation }) => {
+  const renderItem: ListRenderItem<Friend> = ({ item: friend }) => {
+    return (
+      <FriendItem friend={friend} />
+    )
+  };
+
+  // States
+
+  const {
+    friends
+  } = useApp();
+
   return (
     <View style={styles.wrapper}>
       <Banner>
@@ -19,12 +34,14 @@ const SettingsScreen: FC<FindFriendsScreenProps> = ({ navigation }) => {
               color="black"
             />
           </TouchableOpacity>
-          <Text style={styles.header}>Find Friends</Text>
+          <Text style={styles.header}>Friends</Text>
         </View>
       </Banner>
-      <View style={styles.centeredContainer}>
-        <Icon name="tools" size={32} color="white" />
-        <Text style={styles.text}>Screen under construction...</Text>
+      <View style={styles.content}>
+        <FlatList 
+          data={friends}
+          renderItem={renderItem}
+        />
       </View>
     </View>
   );
@@ -54,12 +71,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white'
   },
-  centeredContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16
-  }
+  content: {
+    paddingHorizontal: 16,
+    paddingVertical: 32
+  },
 });
 
 export default SettingsScreen;

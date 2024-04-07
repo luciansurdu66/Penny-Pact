@@ -1,4 +1,5 @@
 import Debt from "../models/Debt";
+import Friend from "../models/Friend";
 import Group from "../models/Group";
 import Payment from "../models/Payment";
 import { ActionType } from "../utils/ActionType";
@@ -7,6 +8,7 @@ interface AppState {
   groups: (Group)[];
   groupPayments: (Payment)[];
   groupDebts: (Debt)[];
+  friends: (Friend)[];
   isFetchingGroups: boolean;
   isFecthingGroupDetails: boolean;
   isSavingGroup: boolean;
