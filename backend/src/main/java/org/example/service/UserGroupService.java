@@ -37,6 +37,10 @@ public class UserGroupService {
         return (List<Integer>) userGroupRepository.findGroupIdsByUserId(userId);
     }
 
+    public List<Integer> getUserIdsByGroupId(int groupId) {
+        return userGroupRepository.findUserIdsByGroupId(groupId);
+    }
+
     public boolean hasUserGroupKeyPair(int userId, int groupId) {
         return userGroupRepository.containsUserGroupKeyPair(userId, groupId);
     }

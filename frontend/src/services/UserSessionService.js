@@ -2,6 +2,60 @@ import axios from "axios";
 import AppConfig from "../configurations/AppConfig";
 
 class UserSessionService {
+  static async addPayment(token, groupId, name, amount, date) {
+    const groupPaymentsUrl = AppConfig.baseUrl + `/user/groups/${groupId}/payments`;
+    const headers = { 'Authorization': token };
+    const config = { headers, timeout: 1000 };
+
+    console.log(`Add Payment '${name}' to Group ${groupId}`);
+
+    return axios.post(groupPaymentsUrl, {
+      name,
+      amount,
+      date
+    }, config);
+  }
+
+  static async addFriend(token, requestedUserId) {
+    const friendsUrl = AppConfig.baseUrl + '/user/friends';
+    const headers = { 'Authorization': token };
+    const config = { headers, timeout: 1000 };
+
+    console.log(`Add Friend User ${requestedUserId}`);
+
+    return axios.post(friendsUrl, { requestedUserId }, config);
+  }
+
+  static async addGroupMember(token, groupId, newMemberId) {
+    const groupMembersUrl = AppConfig.baseUrl + `/user/group/${groupId}/members`;
+    const headers = { 'Authorization': token };
+    const config = { headers, timeout: 1000 };
+
+    console.log(`Add Group ${groupId} member ${newMemberId}`);
+
+    return axios.post(groupMembersUrl, { newMemberId }, config);
+  }
+
+  static async fetchGroupMembers(token, groupId) {
+    const groupMembersUrl = AppConfig.baseUrl + `/user/group/${groupId}/members`;
+    const headers = { 'Authorization': token };
+    const config = { headers, timeout: 1000 };
+
+    console.log("Fetch Group Members");
+
+    return axios.get(groupMembersUrl, config);
+  }
+
+  static async fetchAllFriends(token) {
+    const friendsUrl = AppConfig.baseUrl + '/user/friends';
+    const headers = { 'Authorization': token };
+    const config = { headers, timeout: 1000 };
+
+    console.log("Fetch Friends Request");
+
+    return axios.get(friendsUrl, config);
+  }
+
   static async createGroup(token, groupName) {
     const groupCreationUrl = AppConfig.baseUrl + "/user/group/new";
     const headers = { Authorization: token };

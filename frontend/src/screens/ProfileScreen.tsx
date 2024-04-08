@@ -1,13 +1,17 @@
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { FC } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Banner from "../components/Banner";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useAuth } from "../providers/AuthProvider";
 
-type SetttingsScreenProps = DrawerScreenProps<RootStackParamList, 'Settings'>;
+type SetttingsScreenProps = DrawerScreenProps<RootStackParamList, 'Profile'>;
 
-const SettingsScreen: FC<SetttingsScreenProps> = ({ navigation }) => {
+const ProfileScreen: FC<SetttingsScreenProps> = ({ navigation }) => {
+  const { loggedUser } = useAuth();
+  const defaultProfilePicture = '../../assets/images/person.jpg'
+
   return (
     <View style={styles.wrapper}>
       <Banner>
@@ -19,12 +23,25 @@ const SettingsScreen: FC<SetttingsScreenProps> = ({ navigation }) => {
               color="black"
             />
           </TouchableOpacity>
-          <Text style={styles.header}>Settings</Text>
+          <Text style={styles.header}>
+            Profile
+          </Text>
         </View>
       </Banner>
       <View style={styles.centeredContainer}>
-        <Icon name="tools" size={32} color="white" />
-        <Text style={styles.text}>Screen under construction...</Text>
+        <View
+          style={{ 
+            padding: 32,
+            borderColor: 'white', 
+            borderWidth: 1,
+            alignItems: 'center'
+          }}
+        >
+          <Image source={require(defaultProfilePicture)} style={styles.profilePicture}/>
+          <Text style={styles.text}>ID: #{loggedUser!!.id}</Text>
+          <Text style={styles.text}>Username: {loggedUser!!.username}</Text>
+          <Text style={styles.text}>Email: {loggedUser!!.email}</Text>
+        </View>
       </View>
     </View>
   );
@@ -59,7 +76,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 16
+  },
+  profilePicture: {
+    height: 128,
+    width: 128,
+    marginBottom: 16
   }
 });
 
-export default SettingsScreen;
+export default ProfileScreen;

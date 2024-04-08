@@ -11,7 +11,14 @@ public class Payment {
     private LocalDate date;
     private String name;
 
-    public Payment(int id, int groupId, String name, int userId, double amount, LocalDate date) {
+    public Payment(
+        int id,
+        int groupId,
+        String name,
+        int userId,
+        double amount,
+        LocalDate date
+    ) {
         this.id = id;
         this.groupId = groupId;
         this.name = name;

@@ -7,10 +7,11 @@ import {
   Text, 
   TouchableOpacity, 
   View, 
-  TextInput 
+  TextInput, 
 } from "react-native";
-import GroupItem from "../components/GroupItem";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import GroupItem from "../components/items/GroupItem";
+import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import Banner from "../components/Banner";
 import { useApp } from "../providers/AppProvider";
 import Group from "../models/Group";
@@ -18,22 +19,45 @@ import { RootStackParamList } from "../navigation/AppNavigator";
 import SearchBar from "../components/SearchBar";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import { Button, Dialog } from "react-native-paper";
+import User from "../models/User";
+import FriendInvitationItem from "../components/items/FriendInvitationItem";
 
 type GroupListScreenProps = DrawerScreenProps<RootStackParamList, 'GroupList'>;
 
 const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
-  const renderItem: ListRenderItem<Group> = ({ item }) => {
+  
+  // Renderers
+
+  const renderGroupItem: ListRenderItem<Group> = ({ item }) => {
     return (
       <GroupItem 
         id={item.id}
         name={item.name}
         creator={item.creator}
-        onPress={ () => handleGroupItemPress(item) } 
-        onLongPress={ () => {
-          setGroupMarkedForDeletion(item);
+        onPress={ () => handleGroupItemPress(item) }
+        onInvitePress={() => {
+          setFocusedGroup(item);
+          setIsShowingGroupInvitaitonDialog(true);
+          fetchFriends();
+          fetchGroupMembers(item.id);
+        }}
+        onDeletePress={() => {
+          setFocusedGroup(item);
           setIsGroupDeletionDialogVisible(true);
         }}
-      />);
+      />
+    );
+  };
+
+  const renderFriendItem: ListRenderItem<User> = ({ item: friend }) => {
+    return (
+      <FriendInvitationItem 
+        friend={friend} 
+        onPress={() => {
+          addGroupMember(focusedGroup!!.id, friend.id);
+        }} 
+      />
+    );
   };
 
   // States
@@ -45,7 +69,14 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
     isDeletingGroup, 
     fetchGroups,
     saveGroup,
-    deleteGroup
+    deleteGroup,
+    friends,
+    fetchFriends,
+    isFetchingFriends,
+    isFetchingMembers,
+    fetchGroupMembers,
+    groupMembers,
+    addGroupMember
   } = useApp();
 
   const [searchValue, setSearchValue] = useState('');
@@ -53,8 +84,9 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
   const [groupCreationDialogError, setGroupCreationDialogError] = useState('');
   const [isGroupCreationDialogVisible, setIsGroupCreationDialogVisible] = useState(false);
   const [isGroupDeletionDialogVisible, setIsGroupDeletionDialogVisible] = useState(false);
-  const [groupMarkedForDeletion, setGroupMarkedForDeletion] = useState<Group | undefined>();
+  const [focusedGroup, setFocusedGroup] = useState<Group | undefined>();
   const [groupDeletionDialogError, setGroupDeletionDialogError] = useState('');
+  const [isShowingGroupInvitaitonDialog, setIsShowingGroupInvitaitonDialog] = useState(false);
 
   // Effects
 
@@ -77,7 +109,7 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
       <Banner>
         <View style={styles.bannerContent}>
           <TouchableOpacity onPress={handleMenuButtonPress}>
-            <Icon 
+            <MaterialCommunityIcon 
               name="microsoft-xbox-controller-menu"
               size={64}
               color="black"
@@ -97,7 +129,7 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
               filteredGroups.length > 0 ? (
                 <FlatList 
                   data={filteredGroups}
-                  renderItem={renderItem}
+                  renderItem={renderGroupItem}
                 />
               ) : (
                 <View style={styles.centeredContainer}>
@@ -117,7 +149,7 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
             style={styles.fab}
             onPress={() => setIsGroupCreationDialogVisible(true)}
           >
-            <Icon name='plus-circle' size={64} color={'#f8d717'} />
+            <AntDesignIcon name='pluscircleo' size={64} color={'#f8d717'} />
           </TouchableOpacity>
         )}
       </View>
@@ -134,7 +166,7 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
         }
         style={{ backgroundColor: '#f8d717' }}
       >
-        <Dialog.Title>
+        <Dialog.Title style={{ color: 'black' }}>
           New Group
         </Dialog.Title>
         <Dialog.Content>
@@ -144,7 +176,7 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
               selectTextOnFocus={!isSavingGroup}
               style={styles.input}
               placeholder="Name"
-              placeholderTextColor="black"
+              placeholderTextColor="gray"
               value={groupCreationDialogInputValue}
               onChangeText={
                 newValue => { 
@@ -169,7 +201,11 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
             }}
             textColor="black"
           >
-            <Text>Cancel</Text>
+            <Text
+              style={{ color: 'black' }}
+            >
+              Cancel
+            </Text>
           </Button>
           <Button
             disabled={isSavingGroup}
@@ -181,10 +217,13 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
               }
             }}
             loading={isSavingGroup}
+            labelStyle={{ color: 'black' }}
             contentStyle={{ flexDirection: 'row-reverse' }}
             textColor="black"
           >
-            <Text>
+            <Text
+              style={{ color: 'black' }}
+            >
               {!isSavingGroup ? 'Create' : 'Creating'}
             </Text>
           </Button>
@@ -202,8 +241,8 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
         style={{ backgroundColor: '#f8d717' }}
       >
         <Dialog.Title>
-          <Text>
-            Delete Group {isGroupDeletionDialogVisible && `'${groupMarkedForDeletion!!.name}'`}?
+          <Text style={{ color: 'black' }}>
+            Delete Group {isGroupDeletionDialogVisible && `'${focusedGroup!!.name}'`}?
           </Text>
         </Dialog.Title>
         <Dialog.Content
@@ -233,16 +272,17 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
                 onPress={() => setIsGroupDeletionDialogVisible(false)}
                 textColor="black"
               >
-                <Text>No</Text>
+                <Text style={{ color: 'black' }} >No</Text>
               </Button>
               <Button
                 disabled={isDeletingGroup}
                 onPress={onDeleteGroup}
                 textColor="black"
                 contentStyle={{ flexDirection: 'row-reverse' }}
+                labelStyle={{ color: 'black' }}
                 loading={isDeletingGroup}
               >
-                <Text>{isDeletingGroup ? 'Deleting' : 'Yes'}</Text>
+                <Text style={{ color: 'black' }}>{isDeletingGroup ? 'Deleting' : 'Yes'}</Text>
               </Button>
             </>
           ) : (
@@ -258,6 +298,59 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
               </Button>
             </>
           )}
+        </Dialog.Actions>
+      </Dialog>
+      <Dialog
+        visible={isShowingGroupInvitaitonDialog}
+        style={{
+          backgroundColor: '#f8d717'
+        }}
+        onDismiss={() => setIsShowingGroupInvitaitonDialog(false)}
+      >
+        <Dialog.Title style={{ color: 'black' }}>
+          Invite Friends to '{focusedGroup && focusedGroup!!.name}'
+        </Dialog.Title>
+        <Dialog.Content>
+          {(isFetchingFriends || isFetchingMembers) ? (
+            <View
+              style={{
+                gap: 8,
+                alignItems: 'center',
+                padding: 16
+              }}
+            >
+              <ActivityIndicator
+                size='small' 
+                color='black'
+              />
+              <Text style={{ color: 'black' }}>
+                Loading Friends
+              </Text>
+            </View>
+          ) : friends.filter(friend => !groupMembers.find(memeber => memeber.id == friend.id
+          )).length > 0 ? (
+            <FlatList
+              style={{
+                maxHeight: 256,
+                padding: 16,
+              }}
+              data={friends.filter(friend => !groupMembers.find(memeber => memeber.id == friend.id
+              ))}
+              renderItem={renderFriendItem}
+            />
+          ) : (
+            <Text style={{ color: 'black' }}>
+              All your friends are already in this group...
+            </Text>
+          )}
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button 
+            textColor="black"
+            onPress={() => setIsShowingGroupInvitaitonDialog(false)}
+          >
+            Close
+          </Button>
         </Dialog.Actions>
       </Dialog>
     </View>
@@ -285,7 +378,7 @@ const GroupListScreen: FC<GroupListScreenProps> = ({ navigation }) => {
   }
 
   function onDeleteGroup() {
-    const groupId = groupMarkedForDeletion!!.id;
+    const groupId = focusedGroup!!.id;
 
     deleteGroup(
       groupId, 
@@ -319,7 +412,7 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     opacity: 1,
-    bottom: 32,
+    bottom: 64,
   },
   error: {
     fontSize: 16,
@@ -373,7 +466,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontFamily: 'Avenir',
     padding: 0,
-  }
+  },
 });
 
 export default GroupListScreen;

@@ -7,10 +7,11 @@ import { useAuth } from "../providers/AuthProvider";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import GroupListScreen from "../screens/GroupListScreen";
 import GroupScreen from "../screens/GroupScreen";
-import SettingsScreen from "../screens/SettingsScreen";
+import SettingsScreen from "../screens/ProfileScreen";
 import CustomDrawerContent from "../components/CustomDrawerContent";
 import FriendsScreen from "../screens/FriendsScreen";
 import Group from "../models/Group";
+import ProfileScreen from "../screens/ProfileScreen";
 
 type RootStackParamList = {
   Home: undefined; 
@@ -20,7 +21,7 @@ type RootStackParamList = {
   GroupList: undefined;
   Group: { group: Group };
   Authed: undefined;
-  Settings: undefined;
+  Profile: undefined;
   Friends: undefined;
 };
 
@@ -93,8 +94,8 @@ const Authed: FC = () => {
         component={FriendsScreen}
       />
       <Drawer.Screen 
-        name='Settings'
-        component={SettingsScreen}
+        name='Profile'
+        component={ProfileScreen}
       />
     </Drawer.Navigator>
   );

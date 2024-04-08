@@ -15,16 +15,18 @@ const LoginScreen: React.FC<LoginScreenParams> = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const { setToken } = useAuth();
+  const { setToken, setLoggedUser } = useAuth();
 
   const handleLogin = useCallback(() => {
     setErrorMessage('');
     AuthService.login(email, password)
     .then(response => { 
         const jwtToken = response.data.jwtToken;
+        const loggedUser = response.data.loggedUser;
 
         setErrorMessage('');
         setToken(jwtToken);
+        setLoggedUser(loggedUser);
 
         console.info('Login Response', { status: 'Success', jwtToken });
       })

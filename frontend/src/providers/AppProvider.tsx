@@ -9,18 +9,26 @@ import Group from "../models/Group";
 const AppContext = createContext<AppState | undefined>(undefined);
 
 const initialAppState: AppState = {
-  groups: [],
   groupPayments: [],
+  groupMembers: [],
   groupDebts: [],
   friends: [],
+  groups: [],
   isSavingGroup: false,
   isDeletingGroup: false,
   isFetchingGroups: false, 
-  isFecthingGroupDetails: false,
-  fetchGroups: () => {},
-  fetchGroupDetails: (groupId) => {},
+  isFetchingMembers: false,
+  isFetchingFriends: false,
+  isFetchingGroupDetails: false,
+  addPayment: (groupId: number, name: string, amount: number, date: Date, onSuccess: () => void) => {},
+  addFriend: (requestedUserId: number, onSuccess: () => void, onFailure: (errorMessage: string) => void) => {},
+  deleteGroup: (groupId: number, onSuccess: () => void, onFailure: () => void) => {},
   saveGroup: (groupName: string, onSuccess: () => void) => {},
-  deleteGroup: (groupId: number, onSuccess: () => void, onFailure: () => void) => {}
+  addGroupMember: (groupId: number, newMemberId: number) => {},
+  fetchGroupMembers: (groupId: number) => {},
+  fetchGroupDetails: (groupId) => {},
+  fetchFriends: () => {},
+  fetchGroups: () => {},
 };
 
 const AppProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -31,24 +39,30 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(AppReducer, initialAppState);
   
   // Callbacks
-
-  const fetchGroups = useCallback(fetchGroupsCallback, [token]);
-  const fetchGroupDetails = useCallback(fetchGroupDetailsCallback, [token]);
+  
+  const addFriend = useCallback(addFriendCallback, [token]);
   const saveGroup = useCallback(saveGroupCallback, [token]);
+  const addPayment = useCallback(addPaymentCallback, [token]);
+  const fetchGroups = useCallback(fetchGroupsCallback, [token]);
   const deleteGroup = useCallback(deleteGroupCallback, [token]);
+  const fetchFriends = useCallback(fetchFriendsCallback, [token]);
+  const addGroupMember = useCallback(addGroupMemberCallback, [token]);
+  const fetchGroupDetails = useCallback(fetchGroupDetailsCallback, [token]);
+  const fetchGroupMembers = useCallback(fetchGroupMembersCallback, [token]);
+
+  // Updated App State
 
   const providerValue = { 
     ...state, 
     fetchGroups, 
+    fetchFriends,
     fetchGroupDetails, 
     saveGroup, 
     deleteGroup,
-    friends: [
-      { username: 'Havi' },
-      { username: 'Vlad', profilePicture: require('../../assets/images/vlad.png') },
-      { username: 'Dan' },
-      { username: 'Dalia', profilePicture: require('../../assets/images/dalia.png') },
-    ]
+    fetchGroupMembers,
+    addGroupMember,
+    addFriend,
+    addPayment
   };
 
   return (
@@ -162,6 +176,83 @@ const AppProvider: FC<PropsWithChildren> = ({ children }) => {
         } else {
           setToken(null);
         }
+      });
+  }
+
+  async function fetchFriendsCallback() {
+    dispatch({ type: ActionType.FETCH_FRIENDS_STARTED });
+
+    // Delaying the result one second.
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    UserSessionService.fetchAllFriends(token)
+      .then((response) => {
+        dispatch({ 
+          type: ActionType.FETCH_FRIENDS_SUCCEDED,
+          payload: {
+            friends: response.data.friends
+          }
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch({ type: ActionType.FETCH_FRIENDS_FAILED });
+        setToken(null);
+      });
+  }
+
+  async function fetchGroupMembersCallback(groupId: number) {
+    dispatch({ type: ActionType.FETCH_GROUP_MEMBERS_STARTED });
+
+    UserSessionService.fetchGroupMembers(token, groupId)
+      .then((response) => {
+        dispatch({ 
+          type: ActionType.FETCH_GROUP_MEMBERS_SUCCEDED,
+          payload: {
+            groupMembers: response.data.members
+          }
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch({ type: ActionType.FETCH_GROUP_MEMBERS_FAILED });
+        setToken(null);
+      });
+  }
+
+  async function addGroupMemberCallback(groupId: number, newMemberId: number) {
+    UserSessionService.addGroupMember(token, groupId, newMemberId)
+      .catch((error) => {
+        console.log(error);
+        setToken(null);
+      })
+  }
+
+  async function addFriendCallback(requestedUserId: number, onSuccess: () => void, onFailure: (errorMessage: string) => void) {
+    UserSessionService.addFriend(token, requestedUserId)
+      .then(() => onSuccess())
+      .catch((error) => {
+        if (error.response) {
+          onFailure(error.response.data.message);
+        } else {
+          console.log(error);
+          setToken(null);
+        }
+      });
+  }
+
+  async function addPaymentCallback(
+    groupId: number, 
+    name: string, 
+    amount: number, 
+    date: Date, 
+    onSuccess: () => void
+  ) {
+    UserSessionService.addPayment(token, groupId, name, amount, date)
+      .then(() => onSuccess())
+      .catch((error) => {
+        console.log(error);
+        setToken(null);
       });
   }
 };

@@ -7,6 +7,7 @@ import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +44,33 @@ public class MockUserRepository implements UserRepository {
                 "Dalia",
                 "dalia@org.example.com",
                 "passwd4"
+            ),
+        5, new User(
+                5,
+                "Vlad",
+                "vlad@org.example.com",
+                "passwd5"
             )
+        ));
+
+        users.get(1).addFriend(3);
+        users.get(2).addFriend(2);
+        users.get(3).addFriends(Arrays.asList(2, 5, 1, 4));
+        users.get(4).addFriends(Arrays.asList(3, 5));
+        users.get(5).addFriends(Arrays.asList(3, 4));
+
+        users.put(6, new User(
+            6,
+            "Camelia",
+            "camelia.petrean@org.example.com",
+            "passwd6"
+        ));
+
+        users.put(7, new User(
+            7,
+            "Laura",
+            "laura.manuela@org.example.com",
+            "passwd7"
         ));
     }
 

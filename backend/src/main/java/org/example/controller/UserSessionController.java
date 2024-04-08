@@ -1,19 +1,26 @@
 package org.example.controller;
 
+import org.apache.coyote.Response;
 import org.example.dto.DebtDto;
 import org.example.dto.PaymentDto;
+import org.example.dto.UserDto;
 import org.example.mapper.Mapper;
 import org.example.model.Group;
 import org.example.model.User;
+import org.example.request.AddFriendRequest;
+import org.example.request.AddGroupMemberRequest;
+import org.example.request.AddPaymentRequest;
 import org.example.request.CreateGroupRequest;
 import org.example.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -57,6 +64,11 @@ public class UserSessionController {
         try {
             String userEmail = tokenService.getTokenSubject(token);
             User user = userService.getByEmail(userEmail);
+
+            if (user == null) {
+                throw new JwtException("");
+            }
+
             List<Integer> userGroupIds = userGroupService.getGroupIdsByUserId(user.getId());
 
             logger.info("Get all groups for user {}", user.getId());
@@ -177,6 +189,11 @@ public class UserSessionController {
         try {
             String userEmail = tokenService.getTokenSubject(token);
             User user = userService.getByEmail(userEmail);
+
+            if (user == null) {
+                throw new JwtException("");
+            }
+
             int _newGroupId = groupService.createGroup(groupName, user.getId());
 
             logger.info("User {} requested a new group with the name '{}'", user.getId(), groupName);
@@ -203,6 +220,11 @@ public class UserSessionController {
         try {
             String userEmail = tokenService.getTokenSubject(token);
             User user = userService.getByEmail(userEmail);
+
+            if (user == null) {
+                throw new JwtException("");
+            }
+
             Group groupToBeDeleted = groupService.getGroupById(groupId);
 
             logger.info("User {} requested the deletion of group {}", user.getId(), groupId);
@@ -226,5 +248,162 @@ public class UserSessionController {
         }
 
         return response;
+    }
+
+    @GetMapping("/friends")
+    private ResponseEntity<?> getUserFriends(
+        @RequestHeader("Authorization") String token
+    ) {
+        try {
+            String userEmail = tokenService.getTokenSubject(token);
+            User user = userService.getByEmail(userEmail);
+
+            if (user == null) {
+                throw new JwtException("");
+            }
+
+            List<UserDto> _friends = new ArrayList<>();
+
+            for (int friendId : user.getFriendIds()) {
+                _friends.add(mapper.toUserDto(userService.getById(friendId)));
+            }
+
+            return ResponseEntity.ok(new Object() {
+                public List<UserDto> friends = _friends;
+            });
+        } catch (JwtException ignored) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .build();
+        }
+    }
+
+    @GetMapping("/group/{groupId}/members")
+    public ResponseEntity<?> getGroupMembers(
+        @RequestHeader("Authorization") String token,
+        @PathVariable int groupId
+    ) {
+        try {
+            String userEmail = tokenService.getTokenSubject(token);
+            User user = userService.getByEmail(userEmail);
+
+            // Checking if the user is authorized.
+
+            if (user == null ||
+                !userGroupService.hasUserGroupKeyPair(user.getId(), groupId)) {
+                // The user is not authorized.
+
+                throw new JwtException("");
+            }
+
+            List<Integer> memberIds = userGroupService.getUserIdsByGroupId(groupId);
+            List<UserDto> _members = memberIds.stream()
+                .map(id -> mapper.toUserDto(userService.getById(id)))
+                .toList();
+
+            return ResponseEntity.ok(new Object() {
+                public List<UserDto> members = _members;
+            });
+        } catch (JwtException ignored) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .build();
+        }
+    }
+
+    @PostMapping("/group/{groupId}/members")
+    public ResponseEntity<?> addGroupMember(
+        @RequestHeader("Authorization") String token,
+        @PathVariable int groupId,
+        @RequestBody AddGroupMemberRequest request
+        ) {
+        try {
+            String userEmail = tokenService.getTokenSubject(token);
+            User user = userService.getByEmail(userEmail);
+
+            // Checking if the user is authorized.
+
+            if (user == null ||
+                !userGroupService.hasUserGroupKeyPair(user.getId(), groupId)) {
+                // The user is not authorized.
+
+                throw new JwtException("");
+            }
+
+            int newMemberId = request.newMemberId;
+
+            userGroupService.addUserGroupPair(newMemberId, groupId);
+
+            return ResponseEntity.ok()
+                .build();
+        } catch (JwtException ignored) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .build();
+        }
+    }
+
+    @PostMapping("/friends")
+    public ResponseEntity<?> addFriend(
+        @RequestHeader("Authorization") String token,
+        @RequestBody AddFriendRequest request
+    ) {
+        try {
+            String userEmail = tokenService.getTokenSubject(token);
+            User user = userService.getByEmail(userEmail);
+
+            if (user == null) {
+                throw new JwtException("");
+            }
+
+            User requestedUser = userService.getById(request.requestedUserId);
+
+            if (requestedUser == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Object() {
+                       public String message = "User doesn't exist";
+                    });
+            }
+
+            user.addFriend(request.requestedUserId);
+
+            return ResponseEntity.ok()
+                .build();
+        } catch (JwtException ignored) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .build();
+        }
+    }
+
+    @PostMapping("/groups/{groupId}/payments")
+    public ResponseEntity<?> addGroupPayment(
+        @RequestHeader("Authorization") String token,
+        @PathVariable int groupId,
+        @RequestBody AddPaymentRequest request
+    ) {
+        try {
+            String userEmail = tokenService.getTokenSubject(token);
+            User user = userService.getByEmail(userEmail);
+
+            // Checking if the user is authorized.
+
+            if (user == null ||
+                !userGroupService.hasUserGroupKeyPair(user.getId(), groupId)) {
+                // The user is not authorized.
+
+                throw new JwtException("");
+            }
+
+            paymentService.createPayment(
+                request.getName(),
+                request.getDate(),
+                request.getAmount(),
+                groupId,
+                user.getId()
+            );
+
+            return ResponseEntity.ok()
+                .build();
+        } catch (JwtException ignored) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .build();
+        }
     }
 }

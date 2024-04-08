@@ -19,30 +19,23 @@ const PaymentCard: React.FC<PaymentCardProps> = ({ payment }) => {
     <TouchableOpacity>
       <Card>
         <View style={styles.wrapper}>
-          <View 
-            style={{ 
-              flexDirection: 'row',
-              alignItems: 'center', 
-              gap: 16 
-            }}
-          >
-            <View style={{ alignItems: 'center' }}>
-              <Text style={styles.text}>{month}</Text>
-              <Text style={styles.text}>{day}</Text>
-            </View>
-            <View>
-              <Text style={styles.header}>{name}</Text>
-              <Text style={styles.text}>{user}</Text> 
-            </View>
+          <View style={{ height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={styles.text}>{month}</Text>
+            <Text style={styles.text}>{day}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text numberOfLines={1} style={styles.header}>{name}</Text>
+            <Text numberOfLines={1} style={styles.text}>{user}</Text> 
           </View>
           <View 
             style={{ 
               flexDirection: 'row',
+              height: '100%',
               gap: 8,
-              alignItems: 'center'
+              alignItems: 'center',
             }}
           >
-            <Text style={styles.header}>{amount.toFixed(2)}</Text>
+            <Text numberOfLines={1} style={styles.header}>{amount.toFixed(2)}</Text>
             <Text style={styles.text}>RON</Text>
           </View>
         </View>
@@ -53,9 +46,10 @@ const PaymentCard: React.FC<PaymentCardProps> = ({ payment }) => {
 
 const styles = StyleSheet.create({
   wrapper: {
+    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    gap: 8
   },
   header: {
     color: 'black',

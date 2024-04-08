@@ -6,6 +6,7 @@ import org.example.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -19,9 +20,18 @@ public class PaymentService {
         paymentRepository = _expenseRepository;
     }
 
+    public void createPayment(String name, LocalDate date, double amount, int groupId, int userId) {
+        int newPaymentId = generateUniqueId();
+        Payment newPayment = new Payment(
+            newPaymentId,
+            groupId,
+            name,
+            userId,
+            amount,
+            date
+        );
 
-    public void saveExpense(Payment expense) {
-        paymentRepository.save(expense);
+        paymentRepository.save(newPayment);
     }
 
     public void removeExpense(Integer id) {
@@ -42,5 +52,15 @@ public class PaymentService {
 
     public Payment getById(Integer id) {
         return paymentRepository.findById(id);
+    }
+
+    private int generateUniqueId() {
+        int id = 0;
+
+        for (Payment payment : paymentRepository.findAll()) {
+            id = Math.max(id, payment.getId());
+        }
+
+        return ++id;
     }
 }

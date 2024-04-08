@@ -1,6 +1,6 @@
 package org.example.model;
 
-import java.util.Objects;
+import java.util.*;
 
 public class User {
 
@@ -10,6 +10,8 @@ public class User {
             lastName,
             password,
             email;
+
+    private Set<Integer> friendIds = new HashSet<>();
 
     // Constructors
 
@@ -52,6 +54,22 @@ public class User {
         return id == user.id || Objects.equals(email, user.email);
     }
 
+    // Methods
+
+    public User addFriend(int friendId) {
+        this.friendIds.add(friendId);
+        return this;
+    }
+
+    public User addFriends(List<Integer> friendIds) {
+        this.friendIds.addAll(friendIds);
+        return this;
+    }
+
+    public User removeFriend(int friendId) {
+        friendIds.remove(friendId);
+        return this;
+    }
 
     // Getters and Setters
 
@@ -101,5 +119,9 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Set<Integer> getFriendIds() {
+        return friendIds;
     }
 }

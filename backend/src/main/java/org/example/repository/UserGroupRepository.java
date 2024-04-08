@@ -2,6 +2,8 @@ package org.example.repository;
 
 import org.example.model.UserGroup;
 
+import java.util.List;
+
 public interface UserGroupRepository extends Repository<UserGroup, Integer> {
 
     /**
@@ -26,4 +28,6 @@ public interface UserGroupRepository extends Repository<UserGroup, Integer> {
      * @param groupId The id of the group.
      */
     void removeAllPairsHavingGroupId(int groupId);
+
+    List<Integer> findUserIdsByGroupId(int groupId);
 }

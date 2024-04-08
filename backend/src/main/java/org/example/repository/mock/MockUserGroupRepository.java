@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -31,6 +32,16 @@ public class MockUserGroupRepository implements UserGroupRepository {
     }
 
     // Overrides
+
+
+    @Override
+    public List<Integer> findUserIdsByGroupId(int groupId) {
+        return userGroupMap.values()
+            .stream()
+            .filter(userGroup -> userGroup.getGroupId() == groupId)
+            .map(UserGroup::getUserId)
+            .toList();
+    }
 
     @Override
     public UserGroup save(UserGroup userGroup) throws DuplicatedEntityException {

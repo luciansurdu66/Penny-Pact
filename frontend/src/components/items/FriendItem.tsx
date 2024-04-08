@@ -1,32 +1,33 @@
 import { FC } from "react";
 import { Image, StyleSheet, Text, TouchableNativeFeedback, View } from "react-native";
-import Friend from "../models/Friend";
+import User from "../../models/User";
 
 interface FriendItemProps {
-  friend: Friend
+  friend: User
 }
 
 const FriendItem: FC<FriendItemProps> = ({ friend }) => {
+  const id = friend.id;
+  const email = friend.email;
   const username = friend.username;
-  const profilePicture = friend.profilePicture;
+  const defaultProfilePicture = '../../../assets/images/person.jpg';
 
   return (
-    <TouchableNativeFeedback>
-      <View style={styles.wrapper}>
-        <Image 
-          source={profilePicture ?? require('../../assets/images/person.jpg')} 
-          style={styles.image} 
-        />
-        <View style={styles.details}>
-          <Text 
-            style={styles.username}
-            numberOfLines={1}
-          >
-            {username}
-          </Text>
-        </View>
+    <View style={styles.wrapper}>
+      <Image 
+        source={require(defaultProfilePicture)} 
+        style={styles.image} 
+      />
+      <View style={styles.details}>
+        <Text 
+          style={styles.username}
+          numberOfLines={1}
+        >
+          {username} #{id}
+        </Text>
+        <Text>{email}</Text>
       </View>
-    </TouchableNativeFeedback>
+    </View>
   );
 }
 
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 16,
     gap: 16,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   image: {
     width: 64,
